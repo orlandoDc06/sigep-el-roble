@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('legal_contigurations', function (Blueprint $table) {
+        Schema::create('legal_configurations', function (Blueprint $table) {
             $table->id();
             $table->decimal('afp_percentage', 5, 2);// % AFP
             $table->decimal('isss_percentage', 5, 2);// % ISSS
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('legal_contigurations');
+        Schema::dropIfExists('legal_configurations');
     }
 };
