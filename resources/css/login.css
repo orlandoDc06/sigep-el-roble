@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+
+@layer base {
+    :root {
+        --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+            'Segoe UI Symbol', 'Noto Color Emoji';
+    }
+}
+
+@layer utilities {
+    .bg-verde-sigep {
+        background-color: #247328;
+    }
+    .hover\:bg-verde-sigep-hover:hover {
+        background-color: #1e5e22;
+    }
+
+    .text-verde-sigep {
+        color: #247328;
+    }
+}
