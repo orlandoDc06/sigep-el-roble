@@ -17,7 +17,7 @@ class AdminUserSeeder extends Seeder
             'email' => 'elroble.ferreteria.sv@gmail.com',
         ], [
             'name' => 'Administrador',
-            'password' => bcrypt('sigep.elroble123'),
+            'password' => bcrypt('1234'),
         ]);
 
         $admin->assignRole('Administrador');
