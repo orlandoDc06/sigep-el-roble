@@ -43,4 +43,9 @@ class Form extends Component
     {
         return view('livewire.branches.form');
     }
+
+    //metodo para eliminar imagen
+    public function removeImage(){
+        $this->image_path = null;
+    }
 }

@@ -4,12 +4,15 @@ namespace App\Livewire\Branches;
 use Livewire\Component;
 use App\Models\Branch;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
 
 class Edit extends Component
-{
+{ 
     use WithFileUploads;
     //variables utilizadas en el formulario
     public $branchId, $name, $address, $image_path, $branch, $original_image_path;
+    public $remove_existing_image = false;
+
 
     //carga los datos de la sucursal seleccionada
     public function mount($id)
@@ -22,9 +25,10 @@ class Edit extends Component
         $this->original_image_path = $branch->image_path; //guarda la imagen original para mostrarla si no se sube otra
 
     }
+    
     //actualiza los datos de la sucursal
     public function updateBranch()
-    {   //valida los datos
+    {  //valida los datos
         $this->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
@@ -32,10 +36,19 @@ class Edit extends Component
         ]);
 
         $branch = Branch::findOrFail($this->branchId);
-        //almacena la nueva imagen 
+
+        //para eliminar imagen actual
+        if ($this->remove_existing_image && $branch->image_path) {
+            Storage::disk('public')->delete($branch->image_path);
+            $branch->image_path = null;
+        }
+
+        //eliminar por si se sube una nueva imagen
         if ($this->image_path) {
-            $imagePath = $this->image_path->store('branches', 'public');
-            $branch->image_path = $imagePath;
+            if ($branch->image_path) {
+                Storage::disk('public')->delete($branch->image_path);
+            }
+            $branch->image_path = $this->image_path->store('branches', 'public');
         }
 
         $branch->name = $this->name;
@@ -45,7 +58,6 @@ class Edit extends Component
         session()->flash('message', 'Sucursal actualizada exitosamente.');
         return redirect()->route('branches.index');
     }
-
     //metodo para cancelar y volver al índice sin hacer cambios
     public function returnIndex()
     {
@@ -55,5 +67,15 @@ class Edit extends Component
     public function render()
     {
         return view('livewire.branches.edit');
+    }
+
+    //metodo para eliminar imagen
+    public function removeImage(){
+        if ($this->image_path) {
+            $this->image_path = null;
+        }
+
+        $this->original_image_path = null;
+        $this->remove_existing_image = true;
     }
 }

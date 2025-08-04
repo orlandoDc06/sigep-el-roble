@@ -17,12 +17,20 @@
         @if ($image_path)
             <br><b>Imagen nueva seleccionada:</b>
             <img src="{{ $image_path->temporaryUrl() }}" class="w-36 mt-2 rounded shadow border">
-        @elseif ($original_image_path)
+            <div class="flex items-center space-x-2 mt-2">
+                <button type="button" wire:click="removeImage" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                    Eliminar imagen
+                </button>
+            </div>
+            @elseif ($original_image_path)
             <br><b>Imagen actual:</b>
             <img src="{{ Storage::url($original_image_path) }}" alt="Sucursal" class="w-36 mt-2 rounded shadow border">
-        @else
-            <span class="text-gray-500">Sin imagen</span><br>
-        @endif
+                <button type="button" wire:click="removeImage" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                    Eliminar imagen
+                </button>
+            @else
+                <span class="text-gray-500">Sin imagen</span><br>
+            @endif
         <br>
         <div class="relative w-full">
             <input type="file" id="fileInput" wire:model="image_path" class="hidden">

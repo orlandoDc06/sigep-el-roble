@@ -7,7 +7,12 @@
 
         @if ($image_path)
             <img src="{{ $image_path->temporaryUrl() }}" class="w-36 mt-2 rounded shadow border">
-        @endif
+        <div class="flex items-center space-x-2 mt-2">
+            <button type="button" wire:click="removeImage" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                Eliminar imagen
+            </button>
+        </div>
+            @endif
         <br>
         <div class="relative w-full">
             <input type="file" id="fileInput" wire:model="image_path" class="hidden">
@@ -29,6 +34,7 @@
                 </span>
             </div>
         </div>
+        
         <div class="flex justify-center space-x-4">
             <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-150">
                 Guardar
