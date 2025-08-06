@@ -18,4 +18,31 @@
     .text-verde-sigep {
         color: #247328;
     }
+    .bg-rojo{
+        background-color: #dc2626;
+    }
+    .hover\:bg-rojo-hover:hover {
+        background-color: #b91c1c;
+    }
+    .bg-azul-sigep {
+        background-color: #2563eb;
+    }
+    .hover\:bg-azul-sigep-hover:hover {
+        background-color: #1d4ed8;  
+        border-color: #1d4ed8;
+    }
+    .bg-gray {
+        background-color: #4b5563;
+    }
+    .hover\:bg-gray:hover {
+        background-color: #374151;
+        border-color: #374151;
+    }
+    .bg-amarillo-sigep {
+        background-color: #f59e0b;
+    }
+    .hover\:bg-amarillo-sigep-hover:hover {
+        background-color: #d97706;
+        border-color: #d97706;
+    }
 }

@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Livewire\Auth\ResetPassword;
+use App\Livewire\Auth\ForgotPassword;
 
 use App\Livewire\Branches\Index;
 use App\Livewire\Branches\Form;
@@ -40,8 +42,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/branches/{id}/edit', \App\Livewire\Branches\Edit::class)->name('branches.edit');
 });
 
+
 // Rutas protegidas de gestión de usuarios
 Route::middleware('auth')->group(function () {
     Route::get('/users', UsersIndex::class)->name('users.index');
     Route::get('/users/{id}/edit', UsersEdit::class)->name('users.edit');
 });
+
+Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
+Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
+
