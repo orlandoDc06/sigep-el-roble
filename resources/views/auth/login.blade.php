@@ -54,12 +54,18 @@
                 <div class="mb-5">
                     <input type="checkbox" name="remember"> <label class="text-gray-500 text-sm" for="remember"> Recordar mis credenciales</label>
                 </div>
-                
+
                 <input
                     type="submit"
                     value="Iniciar Sesión"
                     class="bg-verde-sigep hover:bg-verde-sigep-hover transition-colors cursor-pointer uppercase font-bold w-full p-3 text-white rounded-lg"
                 >
+                <div class="mt-4 text-center">
+                    <a href="{{ route('password.request') }}" class="text-blue-600 hover:underline text-sm">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+
             </form>
         </div>
     </div>
