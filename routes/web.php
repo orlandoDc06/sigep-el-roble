@@ -6,6 +6,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\Branches\Index;
 use App\Livewire\Branches\Form;
 
+use App\Livewire\Users\UserIndex;
+use App\Livewire\Users\UsersEdit;
+
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -34,4 +37,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/branches', Index::class)->name('branches.index');
     Route::get('/branches/create', Form::class)->name('branches.create');
     Route::get('/branches/{id}/edit', \App\Livewire\Branches\Edit::class)->name('branches.edit');
+});
+
+// Rutas protegidas de gestión de usuarios
+Route::middleware('auth')->group(function () {
+    Route::get('/users', UsersIndex::class)->name('users.index');
+    Route::get('/users/{id}/edit', UsersEdit::class)->name('users.edit');
 });

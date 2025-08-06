@@ -8,5 +8,8 @@
         <p class="text-gray-700">Desde aquí puedes gestionar empleados, turnos, sucursales y más.</p>
         <br>
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('branches.index') }}"> Sucursales</a></button>
+
+        <!-- Botón para gestionar usuarios -->
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('users.index') }}"> Usuarios</a></button>
     </div>
 @endsection
