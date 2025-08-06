@@ -32,9 +32,11 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    //Tiempo de inactividad permitido en (Minutos) 2 horas
+    'lifetime' => 120, 
 
-    'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
+    //La sesion no se cerrara al cerrar el navegador (Siempre que haya marcado recordar mis credenciales de lo contrario, al cerrar el navegador se cerrara la sesión "Tendra que volver a iniciar sesión con las credenciales")
+    'expire_on_close' =>  true, 
 
     /*
     |--------------------------------------------------------------------------

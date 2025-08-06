@@ -22,6 +22,7 @@ class LoginController extends Controller
 
         $credenciales = $request->only('email', 'password');
 
+        //Mantiene al usuario autenticado incluso despues de cerrar el navegador
         if (Auth::attempt($credenciales, $request->filled('remember'))) {
             $request->session()->regenerate();
             $user = Auth::user();
