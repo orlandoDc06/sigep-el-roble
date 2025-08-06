@@ -6,8 +6,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\Branches\Index;
 use App\Livewire\Branches\Form;
 
-use App\Livewire\Users\UserIndex;
+use App\Livewire\Users\UsersIndex;
 use App\Livewire\Users\UsersEdit;
+
 
 Route::get('/', function () {
     return view('auth.login');
