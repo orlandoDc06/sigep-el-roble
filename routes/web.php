@@ -7,7 +7,8 @@ use App\Livewire\Auth\ForgotPassword;
 
 use App\Livewire\Branches\Index;
 use App\Livewire\Branches\Form;
-
+use App\Livewire\Roles\ManageRoles;
+use App\Livewire\Roles\ViewRoles;
 use App\Livewire\Users\UsersIndex;
 use App\Livewire\Users\UsersEdit;
 
@@ -52,3 +53,17 @@ Route::middleware('auth')->group(function () {
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
 
+// Vista principal de roles
+Route::get('/admin/roles', ViewRoles::class)
+    ->middleware(['auth'])
+    ->name('admin.roles.index');
+
+// Crear nuevo rol
+Route::get('/admin/roles/create', ManageRoles::class)
+    ->middleware(['auth'])
+    ->name('admin.roles.create');
+
+// Editar un rol específico
+Route::get('/admin/roles/{role}/edit', ManageRoles::class)
+    ->middleware(['auth'])
+    ->name('admin.roles.edit');
