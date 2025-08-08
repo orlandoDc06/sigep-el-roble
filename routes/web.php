@@ -7,13 +7,19 @@ use App\Livewire\Auth\ForgotPassword;
 
 use App\Livewire\Branches\Index;
 use App\Livewire\Branches\Form;
-
+use App\Livewire\Roles\ManageRoles;
+use App\Livewire\Roles\ViewRoles;
 use App\Livewire\Users\UsersIndex;
 use App\Livewire\Users\UsersEdit;
 
 use App\Livewire\Shifts\ShiftsIndex;
 use App\Livewire\Shifts\ShiftsEdit;
 use App\Livewire\Shifts\ShiftsForm;
+
+use App\Http\Controllers\Management\EmployeeController;
+use App\Livewire\Employees\EditEmployee;
+use app\Models\Employee;
+use Livewire\Livewire;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -62,3 +68,31 @@ Route::middleware('auth')->group(function () {
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
 
+// Vista principal de roles
+Route::get('/admin/roles', ViewRoles::class)
+    ->middleware(['auth'])
+    ->name('admin.roles.index');
+
+// Crear nuevo rol
+Route::get('/admin/roles/create', ManageRoles::class)
+    ->middleware(['auth'])
+    ->name('admin.roles.create');
+
+// Editar un rol específico
+Route::get('/admin/roles/{role}/edit', ManageRoles::class)
+    ->middleware(['auth'])
+    ->name('admin.roles.edit');
+// Rutas de gestión de empleados
+Route::resource('employees', EmployeeController::class);
+Route::get('/employees/{employee}/edit-live', EditEmployee::class)->name('employees.edit-live');
+Livewire::component('employees.edit-employee', EditEmployee::class);
+
+Route::get('/employees/{employee}/edit', function (Employee $employee) {
+    return view('employees.edit', compact('employee'));
+})->name('employees.edit');
+
+
+// En routes/web.php
+Route::get('/bonuses/create', function () {
+    return 'Formulario de bonificación aún no implementado.';
+})->name('bonuses.create');
