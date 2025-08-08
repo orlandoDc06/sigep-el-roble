@@ -1,0 +1,129 @@
+<div class="p-6 bg-white rounded shadow-md max-w-3xl mx-auto">
+    @if (session()->has('message'))
+        <div class="mb-4 text-green-700 bg-green-100 p-3 rounded">
+            {{ session('message') }}
+        </div>
+    @endif
+
+    <h2 class="text-2xl font-semibold mb-6">Editar Empleado</h2>
+
+    <form wire:submit.prevent="update" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Nombre</label>
+            <input type="text" wire:model="first_name" class="w-full p-2 border rounded" />
+            @error('first_name') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Apellido</label>
+            <input type="text" wire:model="last_name" class="w-full p-2 border rounded" />
+            @error('last_name') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">DUI</label>
+            <input type="text" wire:model="dui" class="w-full p-2 border rounded" />
+            @error('dui') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Teléfono</label>
+            <input type="text" wire:model="phone" class="w-full p-2 border rounded" />
+            @error('phone') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="md:col-span-2">
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Dirección</label>
+            <input type="text" wire:model="address" class="w-full p-2 border rounded" />
+            @error('address') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Fecha de nacimiento</label>
+            <input type="date" wire:model="birth_date" class="w-full p-2 border rounded" />
+            @error('birth_date') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Género</label>
+            <select wire:model="gender" class="w-full p-2 border rounded">
+                <option value="">Seleccionar</option>
+                <option value="male">Masculino</option>
+                <option value="female">Femenino</option>
+                <option value="other">Otro</option>
+            </select>
+            @error('gender') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Estado civil</label>
+            <select wire:model="marital_status" class="w-full p-2 border rounded">
+                <option value="">Seleccionar</option>
+                <option value="single">Soltero/a</option>
+                <option value="married">Casado/a</option>
+                <option value="divorced">Divorciado/a</option>
+                <option value="widowed">Viudo/a</option>
+            </select>
+            @error('marital_status') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Sucursal</label>
+            <select wire:model="branch_id" class="w-full p-2 border rounded">
+                <option value="">Seleccionar</option>
+                @foreach ($branches as $branch)
+                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                @endforeach
+            </select>
+            @error('branch_id') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Tipo de contrato</label>
+            <select wire:model="contract_type_id" class="w-full p-2 border rounded">
+                <option value="">Seleccionar</option>
+                @foreach ($contractTypes as $type)
+                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                @endforeach
+            </select>
+            @error('contract_type_id') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Fecha de contratación</label>
+            <input type="date" wire:model="hire_date" class="w-full p-2 border rounded" />
+            @error('hire_date') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Estado</label>
+            <select wire:model="status" class="w-full p-2 border rounded">
+                <option value="">Seleccionar</option>
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo</option>
+                <option value="suspended">Suspendido</option>
+            </select>
+            @error('status') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="md:col-span-2">
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Foto (URL o ruta)</label>
+            <input type="text" wire:model="photo_path" class="w-full p-2 border rounded" />
+            @error('photo_path') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+
+            @if ($photo_path)
+                <img src="{{ Storage::url($photo_path) }}" alt="Foto del empleado" class="mt-2 h-24 w-24 object-cover rounded" />
+            @endif
+        </div>
+
+        <div class="md:col-span-2 flex justify-end space-x-3">
+            <button type="submit" class="bg-blue-600 text-white font-semibold px-5 py-2 rounded hover:bg-blue-700">
+                Guardar Cambios
+            </button>
+            <a href="{{ route('employees.index') }}" class="px-5 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-100">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
