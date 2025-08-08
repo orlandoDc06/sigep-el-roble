@@ -12,12 +12,14 @@ use App\Livewire\Roles\ViewRoles;
 use App\Livewire\Users\UsersIndex;
 use App\Livewire\Users\UsersEdit;
 
+use App\Livewire\Shifts\ShiftsIndex;
+use App\Livewire\Shifts\ShiftsEdit;
+use App\Livewire\Shifts\ShiftsForm;
+
 use App\Http\Controllers\Management\EmployeeController;
 use App\Livewire\Employees\EditEmployee;
 use app\Models\Employee;
 use Livewire\Livewire;
-
-
 
 Route::get('/', function () {
     return view('auth.login');
@@ -54,6 +56,13 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/users', UsersIndex::class)->name('users.index');
     Route::get('/users/{id}/edit', UsersEdit::class)->name('users.edit');
+});
+
+// Rutas protegidas de gestión de usuarios
+Route::middleware('auth')->group(function () {
+    Route::get('/shifts', ShiftsIndex::class)->name('shifts.index');
+    Route::get('/shifts/create', ShiftsForm::class)->name('shifts.create');
+    Route::get('/shifts/{id}/edit', ShiftsEdit::class)->name('shifts.edit');
 });
 
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
