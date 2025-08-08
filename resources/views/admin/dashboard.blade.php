@@ -14,6 +14,7 @@
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('users.index') }}"> Usuarios</a></button>
 
         <button class="bg-verde-sigep hover:bg-verde-sigep-hover transition-colors cursor-pointer text-white px-4 py-2 rounded"><a href="{{ route('branches.index') }}"> Sucursales</a></button>
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('admin.roles.index') }}"> Roles y permisos</a></button>
     </div>
 
 @endsection
