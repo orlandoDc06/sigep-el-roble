@@ -31,7 +31,7 @@ class ShiftsIndex extends Component
 
         // Verificar si tiene asistencias futuras asignadas (usando relación 'attendances')
         $hasFutureAttendances = $shift->attendances()
-            ->whereDate('date', '>=', now()->toDateString())
+            ->whereDate('check_in_time', '>=', now()->toDateString())
             ->exists();
 
         if ($hasFutureAttendances) {
