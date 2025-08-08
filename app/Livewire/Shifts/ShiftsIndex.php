@@ -16,15 +16,34 @@ class ShiftsIndex extends Component
         $this->shifts = Shift::all(); // all para mostrar todos
     }
 
-    // metodo para eliminar el turno seleccionado
+    /*-------------------------------------------------------------------------------------
+        VERIFICAR USO FUTURO EN MODULO DE ASISTENCIA 
+
+       - Antes de eliminar, verificas que el turno no tenga asistencias futuras asignadas.
+       - Si las tiene, muestras un mensaje de error y no eliminas.
+       - Si no, permites la eliminación
+    ------------------------------------------------------------------------------------ */
+    
+    //Metodo para eliminar un turno
     public function deleteShift($id)
     {
         $shift = Shift::findOrFail($id);
+
+        // Verificar si tiene asistencias futuras asignadas (usando relación 'attendances')
+        $hasFutureAttendances = $shift->attendances()
+            ->whereDate('date', '>=', now()->toDateString())
+            ->exists();
+
+        if ($hasFutureAttendances) {
+            session()->flash('error', 'No se puede eliminar este turno porque tiene asistencias futuras asignadas.');
+            return;
+        }
+
         $shift->delete();
 
         session()->flash('message', 'Turno eliminado con éxito.');
         $this->dispatch('shiftDeleted');
-        redirect()->route('shifts.index'); // recarga la vista actual
+        redirect()->route('shifts.index');
     }
 
     // metodo para redirigir al formulario de edición
