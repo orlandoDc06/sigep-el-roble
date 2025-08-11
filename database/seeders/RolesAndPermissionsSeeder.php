@@ -22,6 +22,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'crear usuarios',
             'editar usuarios',
             'eliminar usuarios',
+            'estado usuarios',
             'ver empleados',
             'crear empleados',
             'editar empleados',

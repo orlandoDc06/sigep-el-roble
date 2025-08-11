@@ -9,8 +9,11 @@ use App\Livewire\Branches\Index;
 use App\Livewire\Branches\Form;
 use App\Livewire\Roles\ManageRoles;
 use App\Livewire\Roles\ViewRoles;
+
 use App\Livewire\Users\UsersIndex;
 use App\Livewire\Users\UsersEdit;
+use App\Livewire\Users\UsersEditEstado;
+use App\Livewire\Users\UsersForm;
 
 use App\Livewire\Shifts\ShiftsIndex;
 use App\Livewire\Shifts\ShiftsEdit;
@@ -56,13 +59,28 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/users', UsersIndex::class)->name('users.index');
     Route::get('/users/{id}/edit', UsersEdit::class)->name('users.edit');
+    Route::get('/edit-estado/{record_id}/{type}', UsersEditEstado::class)->name('edit.estado');
+    Route::get('/users/edit-estado/{user_id}', UsersEditEstado::class)->name('users.edit-estado');
+    Route::get('/employees/{employee}/edit-live', EditEmployee::class)->name('employees.edit-live');
+    Route::get('/users/create', UsersForm::class)->name('users.create');
+    Route::get('/employees/{employee}/edit', \App\Livewire\Employees\EditEmployee::class)->name('employees.edit');
 });
+
+Route::middleware('auth')->group(function () {
+    // Ruta para editar usuario normal (Livewire)
+    Route::get('/users/{id}/edit', UsersEdit::class)->name('users.edit');
+
+    // Ruta para editar empleado (Livewire)
+    Route::get('/employees/{employee}/edit-live', EditEmployee::class)->name('employees.edit-live');
+});
+
 
 // Rutas protegidas de gestión de usuarios
 Route::middleware('auth')->group(function () {
     Route::get('/shifts', ShiftsIndex::class)->name('shifts.index');
     Route::get('/shifts/create', ShiftsForm::class)->name('shifts.create');
     Route::get('/shifts/{id}/edit', ShiftsEdit::class)->name('shifts.edit');
+    Route::get('/edit-estado/{record_id}/{type}', UsersEditEstado::class)->name('edit.estado');
 });
 
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');

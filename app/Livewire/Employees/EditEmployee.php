@@ -14,6 +14,7 @@ public Employee $employee;
     public $user_id, $branch_id, $contract_type_id;
 
     public $branches, $contractTypes;
+       public $email;
 
     public function mount(Employee $employee)
     {
@@ -35,6 +36,8 @@ public Employee $employee;
         $this->branch_id = $employee->branch_id;
         $this->contract_type_id = $employee->contract_type_id;
 
+        $this->email = $employee->user ? $employee->user->email : null;
+
         $this->branches = \App\Models\Branch::all();
         $this->contractTypes = \App\Models\ContractType::all();
     }
@@ -45,6 +48,7 @@ public Employee $employee;
             'first_name' => 'required|string|max:50',
             'last_name' => 'required|string|max:50',
             'dui' => 'required|string|max:20|unique:employees,dui,' . $this->employee->id,
+            'email' => 'required|email|max:255|unique:users,email,' . ($this->employee->user ? $this->employee->user->id : 'NULL'),
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:255',
             'birth_date' => 'nullable|date',
@@ -62,6 +66,7 @@ public Employee $employee;
         $this->employee->update([
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
+            'email' => $this->email,
             'dui' => $this->dui,
             'phone' => $this->phone,
             'address' => $this->address,
@@ -76,6 +81,16 @@ public Employee $employee;
             'branch_id' => $this->branch_id,
             'contract_type_id' => $this->contract_type_id,
         ]);
+
+         // Actualizar tabla users (solo los campos correspondientes)
+        if ($this->employee->user) {
+            $user = $this->employee->user;
+            $user->name = $this->first_name . ' ' . $this->last_name;
+            $user->email = $this->email;
+            $user->profile_image_path = $this->photo_path; // si quieres sincronizar foto también
+            $user->is_active = $this->status === 'active';
+            $user->save();
+        }
 
         session()->flash('message', 'Empleado actualizado correctamente.');
         return redirect()->route('employees.index');

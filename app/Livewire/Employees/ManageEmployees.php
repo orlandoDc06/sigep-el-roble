@@ -87,41 +87,50 @@ class ManageEmployees extends Component
     }
 
     public function store()
-    {
-        $this->validate();
-        if ($this->photoFile) {
+{
+    $this->validate();
+
+    if ($this->photoFile) {
         $this->photo_path = $this->photoFile->store('photos', 'public');
-        }
-
-        if (!$this->hire_date) {
-            $this->hire_date = now()->toDateString();
-        }
-
-        if (!$this->status) {
-            $this->status = 'active';
-        }
-
-        $empleado = Employee::create($this->formData());
-
-
-        $password = Str::random(10);
-
-        // Crear usuario asociado al empleado
-        $user = User::create([
-            'name' => $this->first_name . ' ' . $this->last_name,
-            'email' => $this->email,
-            'password' => Hash::make($password),
-            'employee_id' => $empleado->id,
-        ]);
-        $user->assignRole($this->selectedRoles);
-
-        $user->notify(new SendCredentialNotification($this->email, $password));
-
-        session()->flash('message', 'Empleado y usuario creados correctamente. Credenciales enviadas por correo.');
-
-        $this->resetForm();
-        $this->loadEmployees();
     }
+
+    if (!$this->hire_date) {
+        $this->hire_date = now()->toDateString();
+    }
+
+    if (!$this->status) {
+        $this->status = 'active';
+    }
+
+    $password = Str::random(10);
+
+    // 1. Crear usuario primero (sin employee_id)
+    $user = User::create([
+        'name' => $this->first_name . ' ' . $this->last_name,
+        'email' => $this->email,
+        'password' => Hash::make($password),
+    ]);
+
+    // Asignar rol al usuario
+    $user->assignRole($this->selectedRoles);
+
+    // Crear empleado asignando el user_id
+    $empleado = Employee::create(array_merge($this->formData(), [
+        'user_id' => $user->id,
+        'photo_path' => $this->photo_path,
+    ]));
+
+    
+
+    // Notificar al usuario con sus credenciales
+    $user->notify(new SendCredentialNotification($this->email, $password));
+
+    session()->flash('message', 'Empleado y usuario creados correctamente. Credenciales enviadas por correo.');
+
+    $this->resetForm();
+    $this->loadEmployees();
+}
+
 
     public function edit($id)
     {
