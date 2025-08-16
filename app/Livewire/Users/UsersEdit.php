@@ -6,88 +6,92 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash;
 
 class UsersEdit extends Component
 {
-    use WithFileUploads;//Habilita la carga de archivos
+    use WithFileUploads;
 
-    // Propiedades del usuario
     public $userId;
     public $name;
     public $email;
-    public $profile_image;//imagen nueva
-    public $profile_image_path;//Imagen antigua
+    public $profile_image;      // Imagen nueva subida
+    public $profile_image_path; // Ruta de imagen existente
 
-    // Método para cargar los datos del usuario (como constructor)
+    /**
+     * Carga el usuario a editar según el ID proporcionado.
+     */
     public function mount($id)
     {
+        // Cargar datos del usuario a editar
         $this->userId = $id;
         $user = User::findOrFail($id);
-        
+
+        // Cargar datos del usuario
         $this->name = $user->name;
         $this->email = $user->email;
-        $this->profile_image_path = $user->profile_image ?? null;
+        $this->profile_image_path = $user->profile_image_path ?? null;
     }
 
-    // Método para actualizar el usuario
+    /**
+     * Actualiza los datos del usuario.
+     */
     public function updateUser()
     {
-        // Validaciones
+        // Validar datos
         $this->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $this->userId,
-            'profile_image' => 'nullable|image|max:2048', // 2MB máximo
+            'profile_image' => 'nullable|image|max:2048',
         ]);
 
+        // Cargar usuario
         $user = User::findOrFail($this->userId);
-        
-        // Actualizar datos básicos
-        $user->name = $this->name; 
+
+        // Actualizar datos del usuario
+        $user->name = $this->name;
         $user->email = $this->email;
 
-        // Manejar la imagen de perfil
         if ($this->profile_image) {
             // Eliminar imagen anterior si existe
-            if ($user->profile_image) {
-                Storage::disk('public')->delete($user->profile_image);
+            if ($user->profile_image_path) {
+                Storage::disk('public')->delete($user->profile_image_path);
             }
 
             // Guardar nueva imagen
             $imagePath = $this->profile_image->store('profile-images', 'public');
-            $user->profile_image = $imagePath;
+            $user->profile_image_path = $imagePath;
         }
 
         $user->save();
-
         session()->flash('success', 'Usuario actualizado correctamente.');
-
-        // Redireccionar a la vista de la tabla de usuarios
         return redirect()->route('users.index');
     }
 
-    // Método para eliminar imagen
+    // Método para eliminar la imagen de perfil
     public function removeImage()
     {
-        if ($this->profile_image) {
-            $this->profile_image = null;
-        } elseif ($this->original_profile_image) {
-            $user = User::findOrFail($this->userId);
-            if ($user->profile_image) {
-                Storage::disk('public')->delete($user->profile_image);
-                $user->profile_image = null;
-                $user->save();
-            }
-            $this->original_profile_image = null;
+        $user = User::findOrFail($this->userId);
+
+        // Eliminar imagen en disco si existe
+        if ($user->profile_image_path) {
+            Storage::disk('public')->delete($user->profile_image_path);
         }
+
+        // Limpiar propiedades y actualizar DB
+        $user->profile_image_path = null;
+        $user->save();
+
+        $this->profile_image = null;
+        $this->profile_image_path = null;
     }
 
-    // Método para volver al índice
+    // Método para regresar al índice de usuarios
     public function returnIndex()
     {
         return redirect()->route('users.index');
     }
 
+    // Método para renderizar la vista
     public function render()
     {
         return view('livewire.users.users-edit');

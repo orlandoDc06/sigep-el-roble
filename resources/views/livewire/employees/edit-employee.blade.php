@@ -22,6 +22,12 @@
         </div>
 
         <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Correo electrónico</label>
+            <input type="email" wire:model="email" class="w-full p-2 border rounded" />
+            @error('email') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
             <label class="block mb-1 text-sm font-semibold text-gray-700">DUI</label>
             <input type="text" wire:model="dui" class="w-full p-2 border rounded" />
             @error('dui') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
