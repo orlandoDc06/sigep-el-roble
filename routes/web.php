@@ -6,6 +6,7 @@ use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Branches\Index;
 use App\Livewire\Branches\Form;
+use App\Livewire\Deductions\Index as DeductionsIndex;
 use App\Livewire\Roles\ManageRoles;
 use App\Livewire\Roles\ViewRoles;
 
@@ -21,6 +22,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
 use App\Livewire\Employees\EditEmployee;
 use App\Models\Employee;
+use App\Models\Deduction;
 use Livewire\Livewire;
 
 Route::get('/', function () {
@@ -96,7 +98,6 @@ function checkAdmin() {
         abort(403, 'Acceso denegado. Solo administradores pueden acceder.');
     }
 }
-
 // Función helper para verificar si es empleado
 function checkEmployee() {
     if (!auth()->check()) {
@@ -253,6 +254,24 @@ Route::middleware('auth')->get('/bonuses/create', function() {
     checkAdmin();
     return 'Formulario de bonificación aún no implementado.';
 })->name('bonuses.create');
+
+//rutas de descuentos
+Route::middleware('auth')->group(function() {
+    Route::get('/deductions', function() {
+        checkAdmin();
+        return app(\App\Livewire\Deductions\Index::class)();
+    })->name('deductions.index');
+
+    Route::get('/deductions/create', function() {
+        checkAdmin();
+        return app(\App\Livewire\Deductions\Create::class)();
+    })->name('deductions.create');
+
+    Route::get('/deductions/{id}/edit', function($id) {
+        checkAdmin();
+        return app(\App\Livewire\Deductions\Edit::class)();
+    })->name('deductions.edit');
+});
 
 // Registrar componente Livewire
 Livewire::component('employees.edit-employee', EditEmployee::class);
