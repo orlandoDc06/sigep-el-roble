@@ -131,11 +131,7 @@
 
                                 {{-- Botón Eliminar --}}
                                 @can('eliminar usuarios')
-                                    <button onclick="confirm('⚠ Esta acción puede afectar datos relacionados. ¿Seguro que deseas eliminar este usuario?') || event.stopImmediatePropagation()" 
-                                            wire:click="deleteUser({{ $user->id }})" 
-                                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                                        Eliminar
-                                    </button>
+                                    
                                 @endcan
                             </td>
                         </tr>

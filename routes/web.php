@@ -139,7 +139,7 @@ Route::middleware('auth')->get('/branches/{id}/edit', function($id) {
     return app(\App\Livewire\Branches\Edit::class)();
 })->name('branches.edit');
 
-// Rutas de gestión de usuarios 
+// RUTAS PARA GESTIONAR USUARIOS- SOLO ADMINISTRADORES
 Route::middleware('auth')->get('/users', function() {
     checkAdmin();
     return app(UsersIndex::class)();
@@ -149,6 +149,32 @@ Route::middleware('auth')->get('/users/{id}/edit', function($id) {
     checkAdmin();
     return app(UsersEdit::class)();
 })->name('users.edit');
+
+Route::middleware('auth')->get('/edit-estado/{record_id}/{type}', function($record_id, $type) {
+    checkAdmin();
+    return app(UsersEditEstado::class)();
+})->name('edit.estado');
+
+Route::middleware('auth')->get('/users/edit-estado/{user_id}', function($user_id) {
+    checkAdmin();
+    return app(UsersEditEstado::class)();
+})->name('users.edit-estado');
+
+Route::middleware('auth')->get('/employees/{employee}/edit-live', function($employee) {
+    checkAdmin();
+    return app(EditEmployee::class)();
+})->name('employees.edit-live');
+
+Route::middleware('auth')->get('/users/create', function() {
+    checkAdmin();
+    return app(UsersForm::class)();
+})->name('users.create');
+
+Route::middleware('auth')->get('/employees/{employee}/edit', function($employee) {
+    checkAdmin();
+    return app(\App\Livewire\Employees\EditEmployee::class)();
+})->name('employees.edit');
+//----------------------------------------------------------------------------------------------------------
 
 // Rutas de gestión de turnos - SOLO ADMINISTRADORES
 Route::middleware('auth')->get('/shifts', function() {

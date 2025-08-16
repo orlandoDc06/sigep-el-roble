@@ -17,6 +17,9 @@ class UsersEdit extends Component
     public $profile_image;      // Imagen nueva subida
     public $profile_image_path; // Ruta de imagen existente
 
+    /**
+     * Carga el usuario a editar según el ID proporcionado.
+     */
     public function mount($id)
     {
         // Cargar datos del usuario a editar
@@ -29,6 +32,9 @@ class UsersEdit extends Component
         $this->profile_image_path = $user->profile_image_path ?? null;
     }
 
+    /**
+     * Actualiza los datos del usuario.
+     */
     public function updateUser()
     {
         // Validar datos

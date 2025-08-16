@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UsersEditEstado extends Component
 {
+    //VARIABLES
     public $record_id;
     public $status;
     public $name;
@@ -16,6 +17,9 @@ class UsersEditEstado extends Component
     public $isEmployee = false;
     public $isAdmin = false;
 
+    /**
+     * Carga el registro a editar según el ID proporcionado.
+     */
     public function mount($record_id)
     {
         $this->record_id = $record_id;
@@ -51,6 +55,9 @@ class UsersEditEstado extends Component
         return redirect()->route('users.index');
     }
 
+    /**
+     * Actualiza el estado de un usuario.
+     */
     public function updateStatus()
     {
         if ($this->isUser) {
@@ -63,6 +70,9 @@ class UsersEditEstado extends Component
         }
     }
 
+    /**
+     * Actualiza el estado de un usuario.
+     */
     private function updateUserStatus()
     {
         if ($this->record_id == Auth::id()) {
@@ -82,6 +92,9 @@ class UsersEditEstado extends Component
         return redirect()->route('users.index');
     }
 
+    /**
+     * Actualiza el estado de un empleado.
+     */
     private function updateEmployeeStatus()
     {
         // Elimina espacios antes y después
@@ -96,14 +109,20 @@ class UsersEditEstado extends Component
         $employee->save();
 
         session()->flash('success', 'Estado del empleado actualizado correctamente.');
-        return redirect()->route('employees.index');
+        return redirect()->route('users.index');
     }
 
+    /**
+     * Redirige a la página de índice correspondiente según el tipo de registro.
+     */
     public function returnIndex()
     {
         return $this->isUser ? redirect()->route('users.index') : redirect()->route('employees.index');
     }
 
+    /**
+     * Funcion para renderizar la vista a editar estado
+     */
     public function render()
     {
         // Pasar isAdmin para la vista
