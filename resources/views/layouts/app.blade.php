@@ -12,7 +12,7 @@
 <body class="bg-gray-100">
     <header class="p-5 bg-white shadow">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="flex items-center space-x-3">
+               <a href="{{ auth()->check() ? route('dashboard.redirect') : route('login') }}" class="flex items-center space-x-3">
                 <img src="{{ asset('images/logo roble.png') }}" alt="Logo El Roble" class="h-10 w-auto">
                 <span class="text-3xl font-black text-green-700">Ferretería El Roble</span>
             </a>
