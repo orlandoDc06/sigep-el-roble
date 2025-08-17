@@ -50,4 +50,79 @@ class Employee extends Model
                     ->withPivot(['amount', 'applied_at', 'notes', 'assigned_by'])
                     ->withTimestamps();
     }
+
+    /**
+     * Relación muchos a muchos con turnos usando tabla pivote
+     */
+    public function shifts()
+    {
+        return $this->belongsToMany(Shift::class, 'employee_shift_assignments')
+                   ->withPivot('start_date', 'end_date')
+                   ->withTimestamps();
+    }
+
+    /**
+     * Obtener turnos activos (sin fecha de fin o con fecha de fin futura)
+     */
+    public function activeShifts()
+    {
+        $today = now()->toDateString();
+        return $this->shifts()
+                   ->wherePivot(function ($query) use ($today) {
+                       $query->whereNull('end_date')
+                             ->orWhere('end_date', '>=', $today);
+                   })
+                   ->wherePivot('start_date', '<=', $today);
+    }
+
+    /**
+     * Obtener turnos permanentes (sin fecha de fin)
+     */
+    public function permanentShifts()
+    {
+        return $this->shifts()->wherePivot('end_date', null);
+    }
+
+    /**
+     * Obtener turnos temporales (con fecha de fin)
+     */
+    public function temporaryShifts()
+    {
+        return $this->shifts()->whereNotNull('employee_shift_assignments.end_date');
+    }
+
+    /**
+     * Obtener turnos vencidos
+     */
+    public function expiredShifts()
+    {
+        return $this->shifts()
+                   ->whereNotNull('employee_shift_assignments.end_date')
+                   ->wherePivot('end_date', '<', now()->toDateString());
+    }
+
+    /**
+     * Obtener el turno principal (el primero asignado permanente)
+     */
+    public function primaryShift()
+    {
+        return $this->permanentShifts()
+                   ->orderBy('employee_shift_assignments.start_date')
+                   ->first();
+    }
+
+    /**
+     * Verificar si el empleado tiene turnos activos en una fecha específica
+     */
+    public function hasActiveShiftOnDate($date)
+    {
+        return $this->shifts()
+                   ->wherePivot('start_date', '<=', $date)
+                   ->wherePivot(function ($query) use ($date) {
+                       $query->whereNull('end_date')
+                             ->orWhere('end_date', '>=', $date);
+                   })
+                   ->exists();
+    }
+
 }
