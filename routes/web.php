@@ -26,6 +26,8 @@ use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentIndex;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentForm;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentEdit;
 
+
+
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
 use App\Livewire\Employees\EditEmployee;
@@ -99,7 +101,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/bonuses/{id}/edit', BonusesForm::class)->name('bonuses.edit');
 });
 
-//Rutas para asignacion de bonos 
+//Rutas proteginas  para asignacion de bonos 
 Route::middleware('auth')->group(function () {
 
     // Listado
@@ -114,7 +116,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/bonuses-assignments/{id}/edit', EmployeeBonusAssignmentEdit::class)
         ->whereNumber('id')
         ->name('bonuses-assignments.edit');
+
 });
+
+    
 
 
 // Rutas públicas 
@@ -305,6 +310,38 @@ Route::middleware('auth')->group(function() {
         return app(\App\Livewire\Deductions\Edit::class)();
     })->name('deductions.edit');
 });
+
+//RUTAS PROTEGIDAS PARA LOS BONOS -- SOLO ADMINISTRADORES 
+Route::middleware('auth')->get('/bonuses', function() {
+    checkAdmin();
+    return app(BonusesIndex::class)();
+})->name('bonuses.index');
+
+Route::middleware('auth')->get('/bonuses/create', function() {
+    checkAdmin();
+    return app(BonusesForm::class)();
+})->name('bonuses.create');
+
+Route::middleware('auth')->get('/bonuses/{id}/edit', function($id) {
+    checkAdmin();
+    return app(BonusesForm::class)(['id' => $id]);
+})->whereNumber('id')->name('bonuses.edit');
+
+//RUTAS PROTEGIDAS PARA ASSIGNACION DE BONOS -- SOLO LOS ADMINISTRDORES
+Route::middleware('auth')->get('/bonuses-assignments', function() {
+    checkAdmin();
+    return app(EmployeeBonusAssignmentIndex::class)();
+})->name('bonuses-assignments.index');
+
+Route::middleware('auth')->get('/bonuses-assignments/create', function() {
+    checkAdmin();
+    return app(EmployeeBonusAssignmentForm::class)();
+})->name('bonuses-assignments.create');
+
+Route::middleware('auth')->get('/bonuses-assignments/{id}/edit', function($id) {
+    checkAdmin();
+    return app(EmployeeBonusAssignmentEdit::class)(['id' => $id]);
+})->whereNumber('id')->name('bonuses-assignments.edit');
 
 // Registrar componente Livewire
 Livewire::component('employees.edit-employee', EditEmployee::class);
