@@ -96,10 +96,29 @@
             @error('contract_type_id') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
         </div>
 
+        <!-- 🔹 CAMPO AGREGADO: Turno -->
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Turno</label>
+            <select wire:model="shift_id" class="w-full p-2 border rounded">
+                <option value="">Seleccionar</option>
+                @foreach ($shifts as $shift)
+                    <option value="{{ $shift->id }}">{{ $shift->name }}</option>
+                @endforeach
+            </select>
+            @error('shift_id') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
         <div>
             <label class="block mb-1 text-sm font-semibold text-gray-700">Fecha de contratación</label>
             <input type="date" wire:model="hire_date" class="w-full p-2 border rounded" />
             @error('hire_date') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <!-- 🔹 CAMPO AGREGADO: Fecha de terminación -->
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Fecha de terminación</label>
+            <input type="date" wire:model="termination_date" class="w-full p-2 border rounded" />
+            @error('termination_date') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
         </div>
 
         <div>
@@ -113,6 +132,30 @@
             @error('status') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
         </div>
 
+        <!-- 🔹 CAMPO AGREGADO: Rol -->
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Rol</label>
+            <select wire:model="selectedRoles" class="w-full p-2 border rounded">
+                <option value="">Seleccionar</option>
+                @foreach ($roles as $role)
+                    <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
+                @endforeach
+            </select>
+            @error('selectedRoles') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <!-- 🔹 FOTO: opción por archivo -->
+        <div>
+            <label class="block mb-1 text-sm font-semibold text-gray-700">Foto (Archivo)</label>
+            <input type="file" wire:model="photoFile" class="w-full p-2 border rounded" accept="image/*">
+            @error('photoFile') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+
+            @if ($photoFile)
+                <img src="{{ $photoFile->temporaryUrl() }}" class="mt-2 h-24 w-24 object-cover rounded">
+            @endif
+        </div>
+
+        <!-- 🔹 FOTO: opción por ruta -->
         <div class="md:col-span-2">
             <label class="block mb-1 text-sm font-semibold text-gray-700">Foto (URL o ruta)</label>
             <input type="text" wire:model="photo_path" class="w-full p-2 border rounded" />

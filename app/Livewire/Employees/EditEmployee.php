@@ -3,18 +3,27 @@
 namespace App\Livewire\Employees;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Models\Employee;
+use App\Models\Branch;
+use App\Models\ContractType;
+use App\Models\Shift;
+use Spatie\Permission\Models\Role;
 
 class EditEmployee extends Component
 {
-public Employee $employee;
+    use WithFileUploads;
+    public Employee $employee;
 
     public $first_name, $last_name, $dui, $phone, $address;
     public $birth_date, $hire_date, $termination_date, $gender, $marital_status, $status, $photo_path;
-    public $user_id, $branch_id, $contract_type_id;
+    public $user_id, $branch_id, $contract_type_id, $email;
 
-    public $branches, $contractTypes;
-       public $email;
+
+    public $shift_id, $selectedRoles;
+    public $branches, $contractTypes, $shifts, $roles;
+
+    public $photoFile;
 
     public function mount(Employee $employee)
     {
@@ -35,51 +44,64 @@ public Employee $employee;
         $this->user_id = $employee->user_id;
         $this->branch_id = $employee->branch_id;
         $this->contract_type_id = $employee->contract_type_id;
-
+        $this->shift_id = $employee->shift_id;
         $this->email = $employee->user ? $employee->user->email : null;
 
-        $this->branches = \App\Models\Branch::all();
-        $this->contractTypes = \App\Models\ContractType::all();
+        $this->branches      = Branch::all();
+        $this->contractTypes = ContractType::all();
+        $this->shifts        = Shift::all();
+        $this->roles         = Role::all();
+
+        $this->selectedRoles = $employee->user ? $employee->user->roles->pluck('name')->first() : null;
+
     }
 
     public function update()
     {
         $this->validate([
-            'first_name' => 'required|string|max:50',
-            'last_name' => 'required|string|max:50',
-            'dui' => 'required|string|max:20|unique:employees,dui,' . $this->employee->id,
-            'email' => 'required|email|max:255|unique:users,email,' . ($this->employee->user ? $this->employee->user->id : 'NULL'),
-            'phone' => 'nullable|string|max:15',
-            'address' => 'nullable|string|max:255',
-            'birth_date' => 'nullable|date',
-            'hire_date' => 'required|date',
-            'termination_date' => 'nullable|date|after_or_equal:hire_date',
-            'gender' => 'nullable|in:male,female,other',
-            'marital_status' => 'nullable|in:single,married,divorced,widowed',
-            'status' => 'required|in:active,inactive,suspended',
-            'branch_id' => 'required|exists:branches,id',
-            'contract_type_id' => 'required|exists:contract_types,id',
-            'user_id' => 'nullable|exists:users,id',
-            // Si quieres validar la foto, lo puedes hacer aparte con Livewire file uploads.
+            'first_name'        => 'required|string|max:50',
+            'last_name'         => 'required|string|max:50',
+            'dui'               => 'required|string|max:20|unique:employees,dui,' . $this->employee->id,
+            'email'             => 'required|email|max:255|unique:users,email,' . ($this->employee->user ? $this->employee->user->id : 'NULL'),
+            'phone'             => 'nullable|string|max:15',
+            'address'           => 'nullable|string|max:255',
+            'birth_date'        => 'nullable|date',
+            'hire_date'         => 'required|date',
+            'termination_date'  => 'nullable|date|after_or_equal:hire_date',
+            'gender'            => 'nullable|in:male,female,other',
+            'marital_status'    => 'nullable|in:single,married,divorced,widowed',
+            'status'            => 'required|in:active,inactive,suspended',
+            'branch_id'         => 'required|exists:branches,id',
+            'contract_type_id'  => 'required|exists:contract_types,id',
+            'shift_id'          => 'required|exists:shifts,id',
+            'selectedRoles'     => 'nullable|string|exists:roles,name',
+            'photoFile'         => 'nullable|image|max:2048',
         ]);
 
+        if ($this->photoFile) {
+            $path = $this->photoFile->store('employees', 'public');
+            $this->photo_path = $path;
+        }
+
+
         $this->employee->update([
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'email' => $this->email,
-            'dui' => $this->dui,
-            'phone' => $this->phone,
-            'address' => $this->address,
-            'birth_date' => $this->birth_date,
-            'hire_date' => $this->hire_date,
-            'termination_date' => $this->termination_date,
-            'gender' => $this->gender,
-            'marital_status' => $this->marital_status,
-            'status' => $this->status,
-            'photo_path' => $this->photo_path,  // si usas subida de foto, cambia aquí
-            'user_id' => $this->user_id,
-            'branch_id' => $this->branch_id,
-            'contract_type_id' => $this->contract_type_id,
+            'first_name'        => $this->first_name,
+            'last_name'         => $this->last_name,
+            // 'email'          => $this->email, // Activa esto SOLO si tu tabla employees tiene columna email
+            'dui'               => $this->dui,
+            'phone'             => $this->phone,
+            'address'           => $this->address,
+            'birth_date'        => $this->birth_date,
+            'hire_date'         => $this->hire_date,
+            'termination_date'  => $this->termination_date,
+            'gender'            => $this->gender,
+            'marital_status'    => $this->marital_status,
+            'status'            => $this->status,
+            'photo_path'        => $this->photo_path,
+            'user_id'           => $this->user_id,
+            'branch_id'         => $this->branch_id,
+            'contract_type_id'  => $this->contract_type_id,
+            'shift_id'          => $this->shift_id,
         ]);
 
          // Actualizar tabla users (solo los campos correspondientes)
