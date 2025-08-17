@@ -61,7 +61,7 @@
                     class="bg-verde-sigep hover:bg-verde-sigep-hover transition-colors cursor-pointer uppercase font-bold w-full p-3 text-white rounded-lg"
                 >
                 <div class="mt-4 text-center">
-                    <a href="{{ route('password.request') }}" class="text-blue-600 hover:underline text-sm">
+                    <a href="{{ route('password.request') }}"  class="inline-block bg-gray-100 text-gray-700 font-semibold text-sm px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
                         ¿Olvidaste tu contraseña?
                     </a>
                 </div>
