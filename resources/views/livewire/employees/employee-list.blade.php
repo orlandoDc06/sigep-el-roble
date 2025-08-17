@@ -80,7 +80,7 @@
                         </form>
 
                         @if ($employee->bonuses->isNotEmpty())
-                            <a href="{{ route('bonuses.show', ['bonus' => $employee->bonuses->first()->id]) }}"
+                            <a href="{{ route('bonuses.index', ['bonus' => $employee->bonuses->first()->id]) }}"
                                class="text-green-600 hover:text-green-800 flex items-center gap-1" title="Ver Bono">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                      viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

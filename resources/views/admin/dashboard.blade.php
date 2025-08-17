@@ -14,6 +14,14 @@
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('users.index') }}"> Usuarios</a></button>
         <!-- Botón para gestionar turnos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('shifts.index') }}"> Turnos</a></button>
+
+        <!-- Botón para gestionar bonos -->
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('bonuses.index') }}"> Bonos</a></button>
+
+        <!-- Botón para asignar bonos -->
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('bonuses-assignments.index') }}"> Bonos Asignados</a></button>
+    </div>
+
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('admin.roles.index') }}"> Roles y permisos</a></button>
 
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('employees.index') }}"> Empleados</a></button>

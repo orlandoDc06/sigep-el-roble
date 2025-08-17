@@ -18,6 +18,14 @@ use App\Livewire\Users\UsersForm;
 use App\Livewire\Shifts\ShiftsIndex;
 use App\Livewire\Shifts\ShiftsEdit;
 use App\Livewire\Shifts\ShiftsForm;
+
+use App\Livewire\Bonuses\BonusesIndex;
+use App\Livewire\Bonuses\BonusesForm;
+
+use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentIndex;
+use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentForm;
+use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentEdit;
+
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
 use App\Livewire\Employees\EditEmployee;
@@ -83,6 +91,31 @@ Route::middleware('auth')->group(function () {
     Route::get('/shifts/{id}/edit', ShiftsEdit::class)->name('shifts.edit');
     Route::get('/edit-estado/{record_id}/{type}', UsersEditEstado::class)->name('edit.estado');
 });
+
+//Rutas protegidas para los bonos
+Route::middleware('auth')->group(function () {
+    Route::get('/bonuses', BonusesIndex::class)->name('bonuses.index');
+    Route::get('/bonuses/create', BonusesForm::class)->name('bonuses.create');
+    Route::get('/bonuses/{id}/edit', BonusesForm::class)->name('bonuses.edit');
+});
+
+//Rutas para asignacion de bonos 
+Route::middleware('auth')->group(function () {
+
+    // Listado
+    Route::get('/bonuses-assignments', EmployeeBonusAssignmentIndex::class)
+        ->name('bonuses-assignments.index');
+
+    // Crear
+    Route::get('/bonuses-assignments/create', EmployeeBonusAssignmentForm::class)
+        ->name('bonuses-assignments.create');
+
+    // Editar
+    Route::get('/bonuses-assignments/{id}/edit', EmployeeBonusAssignmentEdit::class)
+        ->whereNumber('id')
+        ->name('bonuses-assignments.edit');
+});
+
 
 // Rutas públicas 
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
@@ -252,7 +285,7 @@ Route::middleware('auth')->get('/employees/{employee}/edit-live', function(Emplo
 
 Route::middleware('auth')->get('/bonuses/create', function() {
     checkAdmin();
-    return 'Formulario de bonificación aún no implementado.';
+    return app(BonusesForm::class)();
 })->name('bonuses.create');
 
 //rutas de descuentos

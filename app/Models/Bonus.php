@@ -22,4 +22,11 @@ class Bonus extends Model
                     ->withPivot(['amount', 'applied_at', 'notes', 'assigned_by'])
                     ->withTimestamps();
     }
+
+    // Función para obtener las asignaciones de empleados relacionadas con este bono
+    public function assignments()
+    {
+        return $this->hasMany(EmployeeBonusAssignment::class, 'bonus_id');
+    }
+
 }
