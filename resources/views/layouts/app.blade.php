@@ -20,8 +20,11 @@
                 <nav class="flex items-center gap-4">
                     <span class="text-sm text-gray-600">
                         Hola,
-                        <a  class="font-semibold text-gray-700 hover:underline">
-                            {{ auth()->user()->employee->first_name ?? auth()->user()->email }}
+                        <a href="{{ route('profile.show') }}" 
+                        class="font-semibold text-gray-700 hover:underline">
+                            {{ auth()->user()->employee->first_name 
+                                ?? auth()->user()->name 
+                                ?? auth()->user()->email }}
                         </a>
                     </span>
 
