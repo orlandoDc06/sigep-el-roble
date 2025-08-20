@@ -30,6 +30,7 @@ use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentEdit;
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
+use App\Http\Controllers\ProfileController;
 use App\Livewire\Employees\EditEmployee;
 use App\Models\Employee;
 use App\Models\Deduction;
@@ -345,3 +346,14 @@ Route::middleware('auth')->get('/bonuses-assignments/{id}/edit', function($id) {
 
 // Registrar componente Livewire
 Livewire::component('employees.edit-employee', EditEmployee::class);
+
+// Perfil del usuario autenticado
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show'])
+        ->name('profile.show');
+});
+
+// Perfil de un empleado (solo admin puede verlo)
+Route::middleware(['auth', 'can:admin']) // o tu checkAdmin()
+    ->get('/employees/{employee}/profile', [ProfileController::class, 'showEmployee'])
+    ->name('employees.profile');
