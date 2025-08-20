@@ -125,4 +125,11 @@ class Employee extends Model
                    ->exists();
     }
 
+    public function deductions()
+    {
+        return $this->belongsToMany(Deduction::class, 'employee_deduction_assignments')
+                    ->withPivot(['amount', 'applied_at', 'notes', 'assigned_by'])
+                    ->withTimestamps();
+    }
+
 }
