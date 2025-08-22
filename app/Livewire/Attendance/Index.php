@@ -167,4 +167,27 @@ class Index extends Component
             'registeredToday' => Attendance::whereDate('check_in_time', $this->selectedDate)->count()
         ]);
     }
+    public function updatedSelectedDate()
+    {
+        $this->resetPage(); // Reiniciar paginación cuando cambia la fecha
+    }
+
+    // funcion para filtrar segun el dia seleccionado y mostrar solo las asistencias de ese dia
+    public function filterByDate($date)
+    {
+        $this->selectedDate = $date;
+        $this->applySearch();
+    }
+    
+    public function applyDateFilter()
+    {
+        $this->resetPage(); // Reiniciar paginación
+    }
+
+    // restablece el filtro de fecha
+    public function resetDateFilter()
+    {
+        $this->selectedDate = Carbon::now()->format('Y-m-d');
+        $this->resetPage();
+    }
 }
