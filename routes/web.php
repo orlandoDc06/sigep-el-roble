@@ -7,6 +7,10 @@ use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Branches\Index;
 use App\Livewire\Branches\Form;
 use App\Livewire\Deductions\Index as DeductionsIndex;
+
+use App\Livewire\Attendance\Index as AttendanceIndex;
+use App\Livewire\Attendance\Register as AttendanceRegister;
+
 use App\Livewire\Roles\ManageRoles;
 use App\Livewire\Roles\ViewRoles;
 
@@ -26,14 +30,14 @@ use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentIndex;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentForm;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentEdit;
 
-
-
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Livewire\Employees\EditEmployee;
 use App\Models\Employee;
 use App\Models\Deduction;
+use App\Models\Attendance;
+use Dom\Attr;
 use Livewire\Livewire;
 
 Route::get('/', function () {
@@ -357,3 +361,15 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'can:admin']) // o tu checkAdmin()
     ->get('/employees/{employee}/profile', [ProfileController::class, 'showEmployee'])
     ->name('employees.profile');
+
+// Rutas de asistencia
+Route::middleware('auth')->group(function() {
+    Route::get('/attendances', function() {
+        checkAdmin();
+        return app(\App\Livewire\Attendance\Index::class)();
+    })->name('attendances.index');
+    Route::get('/attendance/register/{employeeId}', function($employeeId) {
+        checkAdmin();
+        return app(\App\Livewire\Attendance\Register::class, ['employeeId' => $employeeId])();
+    })->name('attendance.register');
+});

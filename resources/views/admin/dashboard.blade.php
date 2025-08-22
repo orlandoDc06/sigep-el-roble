@@ -26,5 +26,6 @@
 
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('employees.index') }}"> Empleados</a></button>
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('deductions.index') }}"> Descuentos</a></button>
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('attendances.index') }}"> Asistencias</a></button>
     </div>
 @endsection
