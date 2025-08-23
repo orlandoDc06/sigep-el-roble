@@ -30,6 +30,10 @@ use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentIndex;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentForm;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentEdit;
 
+use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentIndex;
+use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentForm;
+use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentEdit;
+
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
 use App\Http\Controllers\ProfileController;
@@ -347,6 +351,22 @@ Route::middleware('auth')->get('/bonuses-assignments/{id}/edit', function($id) {
     checkAdmin();
     return app(EmployeeBonusAssignmentEdit::class)(['id' => $id]);
 })->whereNumber('id')->name('bonuses-assignments.edit');
+
+//RUTAS PROTEGIDAS PARA ASSIGNACION DE DESCUENTOS -- SOLO LOS ADMINISTRDORES
+Route::middleware('auth')->get('/deductions-assignments', function() {
+    checkAdmin();
+    return app(EmployeeDeductionAssignmentIndex::class)();
+})->name('deductions-assignments.index');
+
+Route::middleware('auth')->get('/deductions-assignments/create', function() {
+    checkAdmin();
+    return app(EmployeeDeductionAssignmentForm::class)();
+})->name('deductions-assignments.create');
+
+Route::middleware('auth')->get('/deductions-assignments/{id}/edit', function($id) {
+    checkAdmin();
+    return app(EmployeeDeductionAssignmentEdit::class)(['id' => $id]);
+})->whereNumber('id')->name('deductions-assignments.edit');
 
 // Registrar componente Livewire
 Livewire::component('employees.edit-employee', EditEmployee::class);
