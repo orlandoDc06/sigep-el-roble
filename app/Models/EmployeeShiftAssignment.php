@@ -56,4 +56,15 @@ class EmployeeShiftAssignment extends Model
                               ->orWhere('end_date', '>=', $date);
                     });
     }
+    //para obtener el turno actual
+    public function getCurrentShift()
+    {
+        $today = now()->toDateString();
+        return $this->where('start_date', '<=', $today)
+                    ->where(function ($query) use ($today) {
+                        $query->whereNull('end_date')
+                              ->orWhere('end_date', '>=', $today);
+                    })
+                    ->first();
+    }
 }

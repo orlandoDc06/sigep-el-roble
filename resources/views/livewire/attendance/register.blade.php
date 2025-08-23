@@ -1,0 +1,100 @@
+<div class="container mx-auto p-6">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Registrar Asistencia</h1>
+            <a href="{{ route('attendances.index') }}" class="text-blue-600 hover:text-blue-800">
+                Volver al listado
+            </a>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <h2 class="text-lg font-semibold mb-2">Información del Empleado</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-600">Nombre completo:</p>
+                    <p class="font-medium">{{ $employee->first_name }} {{ $employee->last_name }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Email:</p>
+                    <p class="font-medium">{{ $employee->user->email ?? 'No tiene email' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">ID:</p>
+                    <p class="font-medium">{{ $employee->id }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Fecha:</p>
+                    <p class="font-medium">{{ Carbon\Carbon::now()->format('d/m/Y') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <form wire:submit.prevent="registerAttendance">
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-3">Tipo de asistencia:</label>
+                <div class="space-y-3">
+                    <label class="flex items-center">
+                        <input type="radio" wire:model="attendanceType" value="on_time" class="mr-2">
+                        <span class="text-green-600 font-medium">A tiempo</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" wire:model="attendanceType" value="late" class="mr-2">
+                        <span class="text-yellow-600 font-medium">Retraso</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" wire:model="attendanceType" value="absent" class="mr-2">
+                        <span class="text-red-600 font-medium">Ausente</span>
+                    </label>
+                </div>
+                @error('attendanceType') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+            <div class="mb-6">
+                <div>
+                <p class="text-sm text-gray-600">Turno actual:</p>
+                <p class="font-medium">
+                    @php
+                        $currentShift = $employee->getCurrentShift();
+                    @endphp
+                    @if($currentShift)
+                        {{ $currentShift->name }} 
+                        ({{ $currentShift->start_time }} - {{ $currentShift->end_time }})
+                    @else
+                        <span class="text-red-500">Sin turno asignado</span>
+                    @endif
+                </p>
+            </div>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Observaciones:</label>
+                <textarea wire:model="notes" placeholder="Notas adicionales..." class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                @error('notes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+            <div class="flex justify-end space-x-4">
+                <a href="{{ route('attendances.index') }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                    Cancelar
+                </a>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    Registrar Asistencia
+                </button>
+            </div>
+        </form>
+
+        @if(session()->has('success'))
+            <div class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session()->has('error'))
+            <div class="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if(session()->has('warning'))
+            <div class="mt-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                {{ session('warning') }}
+            </div>
+        @endif
+    </div>
+</div>

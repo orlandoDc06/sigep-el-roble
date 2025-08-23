@@ -25,6 +25,12 @@ class Employee extends Model
         'contract_type_id',
     ];
 
+    // Relación con Attendance (Asistencias)
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'employee_id');
+    }
+
     // Relación con Branch (Sucursal)
     public function branch()
     {
@@ -132,4 +138,26 @@ class Employee extends Model
                     ->withTimestamps();
     }
 
+
+    // Relación con las asignaciones de turnos
+    public function shiftAssignments()
+    {
+        return $this->hasMany(EmployeeShiftAssignment::class);
+    }
+
+    // obtiene el turno actual del empleado
+    public function getCurrentShift()
+    {
+        $today = now()->toDateString();
+        
+        return $this->shiftAssignments()
+            ->where(function($query) use ($today) {
+                $query->whereNull('end_date')
+                      ->orWhere('end_date', '>=', $today);
+            })
+            ->where('start_date', '<=', $today)
+            ->with('shift') 
+            ->first()
+            ->shift ?? null; 
+    }
 }
