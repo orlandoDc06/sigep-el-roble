@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->date('applied_at');
             $table->text('notes')->nullable();
+            $table->enum('status', ['active', 'suspend'])->default('active');
             $table->foreignId('assigned_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
