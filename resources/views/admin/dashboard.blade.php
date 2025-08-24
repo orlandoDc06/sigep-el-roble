@@ -20,6 +20,9 @@
 
         <!-- Botón para asignar bonos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('bonuses-assignments.index') }}"> Bonos Asignados</a></button>
+
+        <!-- Botón para asignar descuentos -->
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('deductions-assignments.index') }}"> Descuentos Asignados</a></button>
     </div>
 
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('admin.roles.index') }}"> Roles y permisos</a></button>
@@ -27,5 +30,7 @@
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('employees.index') }}"> Empleados</a></button>
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('deductions.index') }}"> Descuentos</a></button>
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('attendances.index') }}"> Asistencias</a></button>
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('admin.justified-absences') }}"> Permisos y Ausencia</a></button>
+
     </div>
 @endsection

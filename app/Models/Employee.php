@@ -149,15 +149,22 @@ class Employee extends Model
     public function getCurrentShift()
     {
         $today = now()->toDateString();
-        
+
         return $this->shiftAssignments()
             ->where(function($query) use ($today) {
                 $query->whereNull('end_date')
                       ->orWhere('end_date', '>=', $today);
             })
             ->where('start_date', '<=', $today)
-            ->with('shift') 
+            ->with('shift')
             ->first()
-            ->shift ?? null; 
+            ->shift ?? null;
     }
+
+
+ // Relación: Un empleado puede tener muchas ausencias justificadas
+public function justifiedAbsences()
+{
+    return $this->hasMany(\App\Models\JustifiedAbsence::class, 'employee_id');
+}
 }
