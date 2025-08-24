@@ -12,7 +12,7 @@ class Index extends Component
 {
     use WithPagination;
 
-    public $search = '', $perPage = 15, $selectedDate;
+    public $search = '', $perPage = 15, $selectedDate, $attendanceFilter = '';
 
     public function mount()
     {
@@ -24,49 +24,49 @@ class Index extends Component
     {
         $date = Carbon::parse($this->selectedDate);
         
-        return Employee::query()
+        // Filtrar empleados que estaban contratados para la fecha seleccionada
+        $query = Employee::where('hire_date', '<=', $date->format('Y-m-d'))
+            ->where(function($q) use ($date) {
+                $q->whereNull('termination_date')
+                ->orWhere('termination_date', '>=', $date->format('Y-m-d'));
+            })
             ->with(['attendances' => function($query) use ($date) {
                 $query->whereDate('check_in_time', $date);
-            }, 'user'])
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
-                    $q->where('first_name', 'like', '%' . $this->search . '%')
-                      ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('user', function($userQuery) {
-                          $userQuery->where('email', 'like', '%' . $this->search . '%');
-                      });
+            }, 'user']);
+
+        // Aplicar filtro de búsqueda
+        if ($this->search) {
+            $query->where(function($q) {
+                $q->where('first_name', 'ilike', '%' . $this->search . '%')
+                ->orWhere('last_name', 'ilike', '%' . $this->search . '%')
+                ->orWhereHas('user', function($userQuery) {
+                    $userQuery->where('email', 'ilike', '%' . $this->search . '%');
                 });
-            })
-            ->orderBy('first_name', 'asc')
-            ->orderBy('last_name', 'asc')
-            ->paginate($this->perPage);
-    }
-
-    public function getAttendanceStatus($employeeData)
-    {
-        $date = Carbon::parse($this->selectedDate);
-
-        // Obtiene el objeto Employee
-        $employee = $this->getEmployeeObject($employeeData);
-        if (!$employee) {
-            return ['status' => 'pending'];
+            });
         }
 
-        // Carga las asistencias para la fecha seleccionada
-        $employee->load(['attendances' => function($query) use ($date) {
-            $query->whereDate('check_in_time', $date);
-        }]);
+        // Aplicar filtro de estado de asistencia
+        switch ($this->attendanceFilter) {
+            case 'absent':
+                $query->whereDoesntHave('attendances', function($q) use ($date) {
+                    $q->whereDate('check_in_time', $date);
+                });
+                break;
+            case 'on_time':
+                $query->whereHas('attendances', function($q) use ($date) {
+                    $q->whereDate('check_in_time', $date)
+                    ->whereTime('check_in_time', '<=', '08:15:00');
+                });
+                break;
+            case 'late':
+                $query->whereHas('attendances', function($q) use ($date) {
+                    $q->whereDate('check_in_time', $date)
+                    ->whereTime('check_in_time', '>', '08:15:00');
+                });
+                break;
+            }
 
-        // Verifica si hay asistencia registrada
-        if ($employee->attendances->isNotEmpty()) {
-            $attendance = $employee->attendances->first();
-            return [
-                'status' => 'registered',
-                'time' => $attendance->check_in_time->format('H:i'),
-                'is_manual' => $attendance->is_manual_entry
-            ];
-        }
-        return ['status' => 'pending'];
+        return $query->orderBy('first_name')->orderBy('last_name')->paginate($this->perPage);
     }
 
     // Obtiene el objeto Employee
@@ -111,6 +111,11 @@ class Index extends Component
         return redirect()->route('attendance.register', ['employeeId' => $employeeId]);
     }
 
+    public function redirigirEditar($attendanceId)
+    {
+        return redirect()->route('attendance.edit', ['attendanceId' => $attendanceId]);
+    }
+
     //registra la asistencia sin turno(en caso hubiera)
     public function registerWithoutShift($employeeId)
     {
@@ -136,52 +141,38 @@ class Index extends Component
             session()->flash('error', 'Error al registrar asistencia: ' . $e->getMessage());
         }
     }
-    //aplica la busqueda
-    public function applySearch()
-    {
-            $employees = Employee::where(function($query) {
-            $query->where('first_name', 'ilike', '%' . $this->search . '%')
-                ->orWhere('last_name', 'ilike', '%' . $this->search . '%')
-                ->orWhere('address', 'ilike', '%' . $this->search . '%');
-        })->get();
-    }
-
+    
     //restablece la busqueda
     public function resetSearch()
     {
-        $this->search = '';
+        $this->search = ''; 
+        $this->resetPage();
     }
     
     public function render()
     {
-        //busqueda filtrada por nombre o dirección
-        $employees = Employee::where(function($query) {
-            $query->where('first_name', 'ilike', '%' . $this->search . '%')
-                ->orWhere('last_name', 'ilike', '%' . $this->search . '%')
-                ->orWhere('address', 'ilike', '%' . $this->search . '%');
-        })->get();
-
+        $date = Carbon::parse($this->selectedDate);
+        
+        $registeredToday = Attendance::whereDate('check_in_time', $this->selectedDate)->count();
+        
+        // Total de empleados activos en la fecha seleccionada
+        $totalEmployees = Employee::where('hire_date', '<=', $date->format('Y-m-d'))
+            ->where(function($q) use ($date) {
+                $q->whereNull('termination_date')
+                ->orWhere('termination_date', '>=', $date->format('Y-m-d'));
+            })
+            ->count();
+        
         return view('livewire.attendance.index', [
             'employees' => $this->employees,
-            'totalEmployees' => Employee::count(),
-            'registeredToday' => Attendance::whereDate('check_in_time', $this->selectedDate)->count()
+            'totalEmployees' => $totalEmployees,
+            'registeredToday' => $registeredToday
         ]);
     }
+
     public function updatedSelectedDate()
     {
         $this->resetPage(); // Reiniciar paginación cuando cambia la fecha
-    }
-
-    // funcion para filtrar segun el dia seleccionado y mostrar solo las asistencias de ese dia
-    public function filterByDate($date)
-    {
-        $this->selectedDate = $date;
-        $this->applySearch();
-    }
-    
-    public function applyDateFilter()
-    {
-        $this->resetPage(); // Reiniciar paginación
     }
 
     // restablece el filtro de fecha
@@ -189,5 +180,95 @@ class Index extends Component
     {
         $this->selectedDate = Carbon::now()->format('Y-m-d');
         $this->resetPage();
+    }
+
+    // obtiene el estado de asistencia del empleado
+    public function getAttendanceStatus($employeeData)
+    {
+        $date = Carbon::parse($this->selectedDate);
+        
+        $employee = $this->getEmployeeObject($employeeData);
+        if (!$employee) {
+            return ['status' => 'pending', 'status_type' => 'absent'];
+        }
+
+        // Cargar asistencias para la fecha seleccionada
+        $employee->load(['attendances' => function($query) use ($date) {
+            $query->whereDate('check_in_time', $date);
+        }]);
+
+        if ($employee->attendances->isNotEmpty()) {
+            $attendance = $employee->attendances->first();
+            
+            $status = $this->determineAttendanceStatus($attendance);
+            
+            return [
+                'status' => 'registered',
+                'time' => $attendance->check_in_time->format('H:i'),
+                'is_manual' => $attendance->is_manual_entry,
+                'attendance_id' => $attendance->id,
+                'status_type' => $status 
+            ];
+        }
+        return ['status' => 'pending', 'status_type' => 'absent'];
+    }
+
+    protected function determineAttendanceStatus($attendance)
+    {
+        if (!$attendance->check_in_time) {
+            return 'absent';
+        }
+        $scheduledTime = '08:00:00'; 
+        $actualTime = $attendance->check_in_time->format('H:i:s');
+        
+        $tolerance = strtotime('+15 minutes', strtotime($scheduledTime));
+        $actualTimestamp = strtotime($actualTime);
+        
+        if ($actualTimestamp > $tolerance) {
+            return 'late';
+        }
+        
+        return 'on_time';
+    }
+
+    public function updatedAttendanceFilter()
+    {
+        $this->resetPage(); // Reiniciar paginación al cambiar filtro
+    }
+
+    public function resetAllFilters()
+    {
+        $this->reset(['search', 'attendanceFilter']);
+        $this->selectedDate = Carbon::now()->format('Y-m-d');
+        $this->resetPage();
+    }
+
+    // Método para aplicar búsqueda
+    public function applySearch()
+    {
+        $this->resetPage();
+    }
+
+    // Método para filtrar por fecha 
+    public function filterByDate($date)
+    {
+        $this->selectedDate = $date;
+        $this->resetPage();
+    }
+
+    public function applyDateFilter()
+    {
+        $this->resetPage();
+    }
+
+    // Método para filtrar por estado de asistencia
+    public function filterByAttendanceStatus($status)
+    {
+        $this->attendanceFilter = $status;
+        $this->resetPage();
+    }
+    public function redirigirInfoAsistencias($employeeId)
+    {
+        return redirect()->route('employee.infoAsistencias', ['employeeId' => $employeeId]);
     }
 }

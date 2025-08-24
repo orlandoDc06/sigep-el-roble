@@ -1,14 +1,12 @@
 <div>
     <div class="container mx-auto p-4">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-                <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Registros de Asistencia</h1>
-                        <p class="text-sm text-gray-600 mt-1">
-                        Total empleados: {{ $totalEmployees }}
-                        Asistencias hoy: {{ $registeredToday }}
-                    </p>
-                </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">    
+        <h1 class="text-2xl font-bold text-gray-800 ">Registros de Asistencia</h1>
+        <br>
+        
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+                
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <div class="relative w-full sm:w-96">
                 <input type="text" wire:click="applySearch" wire:keydown.enter="applySearch"  wire:model.debounce.300ms="search" placeholder="Buscar por nombre, apellido o email..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -20,7 +18,7 @@
             </div>
 
             <div class="flex items-center gap-2 w-full sm:w-auto">
-                <button wire:click="resetSearch" class="flex items-center gap-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors border border-gray-300" title="Eliminar filtros de búsqueda">
+                <button wire:click="resetAllFilters" class="flex items-center gap-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors border border-gray-300" title="Eliminar filtros de búsqueda">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -59,13 +57,16 @@
                                 Email
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Estado de Asistencia
+                            <!--Agregando filtro-->
+                                <select wire:model.live="attendanceFilter" class="text-xs border border-gray-300 rounded px-2 py-1">
+                                    <option value="" wire:click='resetAllFilters'>Todos los estados</option>
+                                    <option value="on_time">A tiempo</option>
+                                    <option value="late">Retraso</option>
+                                    <option value="absent">Ausente</option>
+                                </select>
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Hora de Registro
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Registrar Asistencia
+                                Informacion de Asistencia
                             </th>
                         </tr>
                     </thead>
@@ -80,47 +81,38 @@
                                         {{ $this->getFullName($employee) }}
                                     </div>
                                 </td>
-                                
                                 <td class="px-6 py-4">
                                     <div class="text-sm text-gray-500">
                                         {{ $this->getEmail($employee) }}
                                     </div>
                                 </td>
-                                
                                 <td class="px-6 py-4">
                                     @if($attendance['status'] === 'registered')
-                                        <div class="flex items-center">
-                                            <span class="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
-                                                Registrada
-                                            </span>
-                                            @if($attendance['is_manual'])
-                                                <span class="ml-2 text-xs text-blue-600">(manual)</span>
+                                        <div class="flex items-center gap-2">
+                                            @if($attendance['status_type'] === 'on_time')
+                                                <span class="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full" title="A tiempo">
+                                                    A tiempo
+                                                </span>
+                                            @elseif($attendance['status_type'] === 'late')
+                                                <span class="px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full" title="Retraso">
+                                                    Retraso
+                                                </span>
+                                            @else
+                                                <span class="px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full" title="Ausente">
+                                                    Ausente
+                                                </span>
                                             @endif
+                                            <a href="{{ route('attendance.edit', ['attendanceId' => $attendance['attendance_id']]) }}" class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm hover:bg-blue-200" title="Editar">Editar</a>
                                         </div>
                                     @else
-                                        <span class="px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">
-                                            Pendiente
-                                        </span>
+                                        <button class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm hover:bg-gray-200" wire:click="redirigirRegistro({{ $employee->id }})" title="Registrar Asistencia">Registrar Asistencia</button>
                                     @endif
                                 </td>
-                                
                                 <td class="px-6 py-4">
-                                    @if($attendance['status'] === 'registered')
-                                        <span class="text-sm text-gray-600">
-                                            {{ $attendance['time'] }}
-                                        </span>
-                                    @else
-                                        <span class="text-sm text-gray-400">
-                                            Sin registro
-                                        </span>
-                                    @endif
+                                        <button wire:click="redirigirInfoAsistencias({{ $employee->id }})" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                                            Ver mas
+                                        </button>
                                 </td>
-                                <td>
-                                    <button wire:click="redirigirRegistro({{ $employee->id }})" class="ml-2 text-xs text-blue-600">
-                                        Registrar
-                                    </button>
-                                </td>
-                            </tr>
                             @empty
                             <tr>
                                 <td colspan="4" class="px-6 py-8 text-center">
