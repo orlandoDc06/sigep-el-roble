@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('employee_id')->constrained()->onDelete('cascade');
             $table->date('date');
             $table->text('reason');
-            $table->foreignId('approved_by')->constrained('users')->onDelete('set null')->nullable();
+            $table-> enum('status', ['pendiente', 'aprobado', 'rechazado'])->default('pendiente');
+            $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }
