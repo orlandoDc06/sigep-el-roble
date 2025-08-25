@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 class Register extends Component
 {
-    public $employeeId, $employee, $attendanceType = 'on_time', $notes = '', $selectedShift, $shifts = [], $getShift;
+    public $employeeId, $employee, $attendanceType = 'on_time', $notes = '', $selectedShift, $shifts = [];
 
     protected $rules = [
         'attendanceType' => 'required|in:on_time,late,absent',
@@ -18,25 +18,25 @@ class Register extends Component
         'selectedShift' => 'nullable|exists:shifts,id'
     ];
 
-    // Inicializa el componente
     public function mount($employeeId)
     {
         $this->employeeId = $employeeId;
-        $this->employee = Employee::with(['user', 'shiftAssignments.shift'])->find($employeeId);
+        $this->employee = Employee::with(['user'])->find($employeeId);
 
-    if (!$this->employee) {
-        session()->flash('error', 'Empleado no encontrado.');
-        return redirect()->route('attendances.index');
+        if (!$this->employee) {
+            session()->flash('error', 'Empleado no encontrado.');
+            return redirect()->route('attendances.index');
+        }
+
+        // Obtener todos los turnos disponibles
+        $this->shifts = Shift::all();
+        
+        // Obtener el turno actual del empleado
+        $currentShift = $this->employee->getCurrentShift();
+        
+        // Establecer el turno seleccionado
+        $this->selectedShift = $currentShift ? $currentShift->id : ($this->shifts->first()?->id);
     }
-
-    // obtiene el turno actual del empleado
-    $currentShift = $this->employee->getCurrentShift();
-
-    // obtiene todos los turnos disponibles
-    $this->shifts = Shift::all();
-
-    $this->selectedShift = $currentShift ? $currentShift->id : ($this->shifts->first()?->id);
-}
 
     // Registra la asistencia
     public function registerAttendance()
@@ -54,15 +54,25 @@ class Register extends Component
         }
 
         try {
-            // usa el turno seleccionado o el turno actual del empleado
-            $shiftId = $this->selectedShift ?: ($this->employee->currentShift?->id);
+            $checkInTime = Carbon::now();
+            
+            switch ($this->attendanceType) {
+                case 'on_time':
+                    break;
+                case 'late':
+                    break;
+                case 'absent':
+                    session()->flash('warning', 'El estado "Ausente" se maneja de forma especial.');
+                    return;
+            }
 
             Attendance::create([
                 'employee_id' => $this->employeeId,
-                'shift_id' => $shiftId,
-                'check_in_time' => Carbon::now(),
+                'shift_id' => $this->selectedShift,
+                'check_in_time' => $checkInTime,
                 'is_manual_entry' => true,
                 'device_id' => 'manual_' . auth()->id(),
+                'notes' => $this->notes,
             ]);
 
             session()->flash('success', 'Asistencia registrada exitosamente para ' . $this->employee->first_name);
@@ -71,5 +81,10 @@ class Register extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Error al registrar asistencia: ' . $e->getMessage());
         }
+    }
+
+    public function render()
+    {
+        return view('livewire.attendance.register');
     }
 }

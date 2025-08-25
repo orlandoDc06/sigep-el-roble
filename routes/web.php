@@ -10,6 +10,8 @@ use App\Livewire\Deductions\Index as DeductionsIndex;
 
 use App\Livewire\Attendance\Index as AttendanceIndex;
 use App\Livewire\Attendance\Register as AttendanceRegister;
+use App\Livewire\Attendance\Edit as AttendanceEdit;
+use App\Livewire\Attendance\InfoEmployee as InfoEmployee;
 
 use App\Livewire\Roles\ManageRoles;
 use App\Livewire\Roles\ViewRoles;
@@ -47,6 +49,8 @@ use App\Models\Deduction;
 use App\Models\Attendance;
 use Dom\Attr;
 use Livewire\Livewire;
+use App\Livewire\Admin\JustifiedAbsenceList;
+use App\Livewire\Employees\JustifiedAbsence\JustifiedAbsenceManager;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -114,7 +118,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/bonuses/{id}/edit', BonusesForm::class)->name('bonuses.edit');
 });
 
-//Rutas proteginas  para asignacion de bonos 
+//Rutas proteginas  para asignacion de bonos
 Route::middleware('auth')->group(function () {
 
     // Listado
@@ -139,7 +143,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/advances/{id}/edit', AdvancesEdit::class)->name('advances.edit');
 });
 
-// Rutas públicas 
+
+// Rutas públicas
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
 
@@ -148,7 +153,7 @@ function checkAdmin() {
     if (!auth()->check()) {
         abort(401, 'No autenticado');
     }
-    
+
     if (!auth()->user()->hasRole('Administrador')) {
         abort(403, 'Acceso denegado. Solo administradores pueden acceder.');
     }
@@ -158,7 +163,7 @@ function checkEmployee() {
     if (!auth()->check()) {
         abort(401, 'No autenticado');
     }
-    
+
     if (!auth()->user()->hasRole('Empleado')) {
         abort(403, 'Acceso denegado. Solo empleados pueden acceder.');
     }
@@ -179,7 +184,7 @@ Route::middleware('auth')->get('/employee/dashboard', function() {
     return view('employee.dashboard');
 })->name('employee.dashboard');
 
-// Rutas de sucursales 
+// Rutas de sucursales
 Route::middleware('auth')->get('/branches', function() {
     checkAdmin();
     return app(Index::class)();
@@ -328,7 +333,7 @@ Route::middleware('auth')->group(function() {
     })->name('deductions.edit');
 });
 
-//RUTAS PROTEGIDAS PARA LOS BONOS -- SOLO ADMINISTRADORES 
+//RUTAS PROTEGIDAS PARA LOS BONOS -- SOLO ADMINISTRADORES
 Route::middleware('auth')->get('/bonuses', function() {
     checkAdmin();
     return app(BonusesIndex::class)();
@@ -400,4 +405,25 @@ Route::middleware('auth')->group(function() {
         checkAdmin();
         return app(\App\Livewire\Attendance\Register::class, ['employeeId' => $employeeId])();
     })->name('attendance.register');
+    Route::get('/attendance/edit/{attendanceId}', \App\Livewire\Attendance\Edit::class)
+        ->name('attendance.edit');
+    });
+    Route::get('/employees/{employeeId}/infoAsistencias', InfoEmployee::class)
+        ->name('employee.infoAsistencias');
+
+// Rutas de ausencias justificadas para empleados
+Route::middleware(['auth'])->group(function() {
+    Route::get('/ausencias-justificadas', function() {
+        checkEmployee();
+        return app(JustifiedAbsenceManager::class)();
+    })->name('ausencias-justificadas');
 });
+
+// Rutas de ausencias justificadas para administradores
+Route::middleware(['auth'])->group(function() {
+    Route::get('/admin/justified-absences', function() {
+        checkAdmin();
+        return app(JustifiedAbsenceList::class)();
+    })->name('admin.justified-absences');
+});
+
