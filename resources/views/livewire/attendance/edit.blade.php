@@ -2,9 +2,9 @@
     <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
 
         <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Registrar Asistencia</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Editar Asistencia</h1>
             <a href="{{ route('attendances.index') }}" class="text-blue-600 hover:text-blue-800">
-                Volver al listado
+                ← Volver al listado
             </a>
         </div>
         
@@ -25,12 +25,13 @@
                 </div>
                 <div>
                     <p class="text-sm text-gray-600">Fecha:</p>
-                    <p class="font-medium">{{ Carbon\Carbon::now()->format('d/m/Y') }}</p>
+                    <p class="font-medium">{{ $attendance->check_in_time->format('d/m/Y') }}</p>
                 </div>
             </div>
         </div>
 
-        <form wire:submit.prevent="registerAttendance">
+        <form wire:submit.prevent="updateAttendance">
+            <!-- Tipo de asistencia -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-3">Tipo de asistencia:</label>
                 <div class="space-y-3">
@@ -49,6 +50,7 @@
                 </div>
                 @error('attendanceType') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
+
             <!-- Turno -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Turno asignado:</label>
@@ -64,23 +66,34 @@
                     @endif
                 </div>
             </div>
+            
+            <!-- Campo oculto para el turno -->
+            <input type="hidden" wire:model="selectedShift" value="{{ $employee->getCurrentShift()->id ?? '' }}">
 
+            <!-- Notas -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Observaciones:</label>
-                <textarea wire:model="notes" placeholder="Notas adicionales..." class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                <textarea 
+                    wire:model="notes" 
+                    placeholder="Notas adicionales..."
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows="3"
+                >{{ $notes }}</textarea>
                 @error('notes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
 
+            <!-- Botones -->
             <div class="flex justify-end space-x-4">
                 <a href="{{ route('attendances.index') }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
                     Cancelar
                 </a>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                    Registrar Asistencia
+                    Actualizar Asistencia
                 </button>
             </div>
         </form>
 
+        <!-- Mensajes flash -->
         @if(session()->has('success'))
             <div class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
                 {{ session('success') }}
@@ -90,12 +103,6 @@
         @if(session()->has('error'))
             <div class="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                 {{ session('error') }}
-            </div>
-        @endif
-
-        @if(session()->has('warning'))
-            <div class="mt-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-                {{ session('warning') }}
             </div>
         @endif
     </div>

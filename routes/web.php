@@ -10,6 +10,8 @@ use App\Livewire\Deductions\Index as DeductionsIndex;
 
 use App\Livewire\Attendance\Index as AttendanceIndex;
 use App\Livewire\Attendance\Register as AttendanceRegister;
+use App\Livewire\Attendance\Edit as AttendanceEdit;
+use App\Livewire\Attendance\InfoEmployee as InfoEmployee;
 
 use App\Livewire\Roles\ManageRoles;
 use App\Livewire\Roles\ViewRoles;
@@ -394,8 +396,11 @@ Route::middleware('auth')->group(function() {
         checkAdmin();
         return app(\App\Livewire\Attendance\Register::class, ['employeeId' => $employeeId])();
     })->name('attendance.register');
-});
-
+    Route::get('/attendance/edit/{attendanceId}', \App\Livewire\Attendance\Edit::class)
+        ->name('attendance.edit');
+    });
+    Route::get('/employees/{employeeId}/infoAsistencias', InfoEmployee::class)
+        ->name('employee.infoAsistencias');
 
 // Rutas de ausencias justificadas para empleados
 Route::middleware(['auth'])->group(function() {
