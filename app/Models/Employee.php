@@ -160,4 +160,10 @@ class Employee extends Model
             ->first()
             ->shift ?? null; 
     }
+
+    //Ralacion con los anticipos 
+    public function anticipos()
+    {
+        return $this->hasMany(Anticipo::class);
+    }
 }

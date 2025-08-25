@@ -26,6 +26,10 @@ use App\Livewire\Shifts\ShiftsForm;
 use App\Livewire\Bonuses\BonusesIndex;
 use App\Livewire\Bonuses\BonusesForm;
 
+use App\Livewire\Advances\AdvancesIndex;
+use App\Livewire\Advances\AdvancesForm;
+use App\Livewire\Advances\AdvancesEdit;
+
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentIndex;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentForm;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentEdit;
@@ -128,8 +132,12 @@ Route::middleware('auth')->group(function () {
 
 });
 
-    
-
+//Rutas protegidas para anticipos
+Route::middleware('auth')->group(function () {
+    Route::get('/advances', AdvancesIndex::class)->name('advances.index');
+    Route::get('/advances/create', AdvancesForm::class)->name('advances.create');
+    Route::get('/advances/{id}/edit', AdvancesEdit::class)->name('advances.edit');
+});
 
 // Rutas públicas 
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
