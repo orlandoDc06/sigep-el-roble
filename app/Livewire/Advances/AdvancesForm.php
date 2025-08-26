@@ -60,24 +60,6 @@ class AdvancesForm extends Component
             'approved_by' => Auth::id(),
         ]);
 
-         // Crear deducción automáticamente (deduction)
-        $deduction = Deduction::firstOrCreate([
-            'name' => 'Anticipo #' . $advance->id . ' - ' . Employee::find($this->employee_id)->first_name,
-            'description' => 'Descuento automático por anticipos otorgados',
-            'default_amount' => $this->amount,
-            'applies_to_all' => false,
-        ]);
-
-        // Asignar deducción al empleado
-        EmployeeDeductionAssignment::create([
-             'employee_id' => $this->employee_id,
-            'deduction_id' => $deduction->id,
-            'amount' => $this->amount,
-            'applied_at' => now(),
-            'notes' => "Anticipo del {$this->date}: {$this->reason}",
-            'assigned_by' => Auth::id(),
-        ]);
-
         // Mensaje de éxito
         session()->flash('message', 'Anticipo registrado correctamente.');
         return redirect()->route('advances.index');

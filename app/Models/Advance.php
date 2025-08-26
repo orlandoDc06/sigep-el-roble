@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Advance extends Model
 {
     //Atributos de la tabla
-    protected $fillable = ['employee_id', 'amount', 'date', 'reason', 'approved_by'];
+    protected $fillable = ['employee_id', 'amount', 'date', 'reason', 'approved_by',  'status',];
 
     // Relación con el empleado
     public function employee()

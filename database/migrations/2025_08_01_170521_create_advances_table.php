@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('date');
             $table->text('reason')->nullable();
             $table->foreignId('approved_by')->constrained('users')->onDelete('set null')->nullable();
+            $table->enum('status', ['active', 'suspend'])->default('active'); // Para el estado
             $table->timestamps();
         });
     }

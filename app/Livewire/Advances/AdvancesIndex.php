@@ -9,52 +9,48 @@ use Livewire\WithPagination;
 
 class AdvancesIndex extends Component
 {
-    //Usa la 
     use WithPagination;
 
-    //Variables para la búsqueda y filtros
     public $search = '';
     public $employees;
     public $filterMonth = 'all';
 
     protected $paginationTheme = 'tailwind';
 
-    public $confirmingDeletion = false;
-    public $advanceToDelete = null;
+    // Modal de confirmación para cambio de estado
+    public $confirmingStatusChange = false;
+    public $advanceIdBeingUpdated = null;
 
-    // Para modal informativo si no se puede eliminar
+    // Modal informativo
     public $infoModal = false;
     public $infoMessage = '';
 
-
-    //Metodo para inicializar los datos
+    // Metodo para Inicializar componente
     public function mount()
     {
-        // Obtener todos los empleados
         $this->employees = Employee::all();
     }
 
-    //Metodo para aplicar la búsqueda
+    // Metodo para Aplicar búsqueda
     public function applySearch()
     {
         $this->resetPage();
     }
 
-    //Metodo para reiniciar la búsqueda
+    // Metodo para Reiniciar búsqueda
     public function resetSearch()
     {
         $this->search = '';
-        $this->filterStatus = 'all';
+        $this->filterMonth = 'all';
         $this->resetPage();
     }
 
-    //Metodo para renderizar la vista
+    // Metodo para Renderizar la vista
     public function render()
     {
-        // Crear la consulta base para los anticipos
         $query = Advance::with('employee');
 
-        // Buscar por nombre de empleado
+        // Buscar por nombre
         if ($this->search) {
             $query->whereHas('employee', function ($q) {
                 $q->where('first_name', 'like', '%' . $this->search . '%')
@@ -67,37 +63,32 @@ class AdvancesIndex extends Component
             $query->whereMonth('date', $this->filterMonth);
         }
 
-        // Paginación para los anticipos 
         $advances = $query->latest()->paginate(10);
 
         return view('livewire.advances.advances-index', compact('advances'));
     }
 
-    // Confirmar eliminación
-    public function confirmDelete($id)
+    // Metodo para Confirmar cambio de estado
+    public function confirmStatusChange($id)
     {
-        $this->advanceToDelete = $id;
-        $this->confirmingDeletion = true;
+        $this->advanceIdBeingUpdated = $id;
+        $this->confirmingStatusChange = true;
     }
 
-    // Eliminar anticipo
-    public function deleteConfirmed()
+    // Metodo para Cambiar estado (activar o suspender)
+    public function changeStatus()
     {
-        $advance = Advance::findOrFail($this->advanceToDelete);
+        // Cambiar estado según la acción
+        $advance = Advance::findOrFail($this->advanceIdBeingUpdated);
 
-        // No eliminar si ya fue aprobado
-        if ($advance->approved_by) {
-            $this->infoMessage = "No se puede eliminar un anticipo que ya fue aprobado.";
-            $this->infoModal = true;
-        } else {
-            $advance->delete();
-            session()->flash('success', 'Anticipo eliminado correctamente.');
-        }
+        // Cambiar estado
+        $advance->status = $advance->status === 'active' ? 'suspend' : 'active';
+        $advance->save();
 
-        $this->confirmingDeletion = false;
-        $this->advanceToDelete = null;
+        session()->flash('success', 'Estado actualizado correctamente.');
 
-        $this->resetPage(); // Recarga los anticipos
+        $this->confirmingStatusChange = false;
+        $this->advanceIdBeingUpdated = null;
+        $this->resetPage();
     }
-
 }
