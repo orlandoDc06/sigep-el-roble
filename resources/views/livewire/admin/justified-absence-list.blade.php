@@ -11,6 +11,24 @@
 
     <h2 class="text-2xl font-semibold text-gray-800">Ausencias de Empleados</h2>
 
+    {{-- Barra de búsqueda --}}
+    <div class="flex items-center space-x-2">
+        <input type="text"
+               wire:model.defer="search"
+               placeholder="Buscar por empleado, apellido o DNI..."
+               class="border rounded px-3 py-2 w-full focus:outline-none focus:ring focus:ring-indigo-300">
+
+        <button wire:click="applySearch"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
+            Buscar
+        </button>
+
+        <button wire:click="resetSearch"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">
+            Limpiar
+        </button>
+    </div>
+
     <div class="overflow-x-auto">
         <table class="w-full table-auto border-collapse border border-gray-200">
             <thead class="bg-gray-100">
@@ -23,10 +41,14 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($absences as $absence)
+                @forelse($absences as $absence)
                     <tr class="border-t hover:bg-gray-50 transition-colors">
-                        <td class="px-4 py-2">{{ $absence->employee->first_name }} {{ $absence->employee->last_name }}</td>
-                        <td class="px-4 py-2"> {{ \Carbon\Carbon::parse($absence->date)->format('d-m-Y') }} </td>
+                        <td class="px-4 py-2">
+                            {{ $absence->employee->first_name }} {{ $absence->employee->last_name }}
+                        </td>
+                        <td class="px-4 py-2">
+                            {{ \Carbon\Carbon::parse($absence->date)->format('d-m-Y') }}
+                        </td>
                         <td class="px-4 py-2">{{ $absence->reason }}</td>
                         <td class="px-4 py-2 capitalize">
                             <span class="px-2 py-1 rounded
@@ -52,7 +74,13 @@
                             @endif
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-gray-500">
+                            No se encontraron resultados.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
