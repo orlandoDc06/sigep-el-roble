@@ -9,7 +9,7 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Empleado</label>
             <select wire:model="employee_id" class="w-full border border-gray-300 rounded px-4 py-2">
-                <option value=""> Seleccionar empleado</option>
+                <option value="">Seleccionar empleado</option>
                 @foreach($employees as $emp)
                     <option value="{{ $emp->id }}">{{ $emp->first_name }} {{ $emp->last_name }}</option>
                 @endforeach
