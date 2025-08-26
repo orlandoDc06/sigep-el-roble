@@ -23,6 +23,10 @@
 
         <!-- Botón para asignar descuentos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('deductions-assignments.index') }}"> Descuentos Asignados</a></button>
+
+        <!-- Botón para gestion de anticipos -->
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('advances.index') }}"> Anticipos</a></button>
+
     </div>
 
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('admin.roles.index') }}"> Roles y permisos</a></button>

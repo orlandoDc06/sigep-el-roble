@@ -32,7 +32,11 @@ class EmployeeDeductionAssignmentForm extends Component
     public function mount()
     {
         $this->employees = Employee::all();
-        $this->deductions = Deduction::all();
+
+        // Excluir TODO lo que empiece con "Anticipo"
+        $this->deductions = Deduction::where('name', 'NOT LIKE', 'Anticipo%')
+                             ->get();
+                                 
         $this->applied_at = Carbon::now()->format('Y-m-d'); // Fecha actual
     }
 

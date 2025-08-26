@@ -161,10 +161,16 @@ class Employee extends Model
             ->shift ?? null;
     }
 
+    // Relación con los anticipos
+    public function anticipos()
+    {
+        return $this->hasMany(Anticipo::class);
+    }
 
- // Relación: Un empleado puede tener muchas ausencias justificadas
-public function justifiedAbsences()
-{
-    return $this->hasMany(\App\Models\JustifiedAbsence::class, 'employee_id');
-}
+
+    // Relación: Un empleado puede tener muchas ausencias justificadas
+    public function justifiedAbsences()
+    {
+        return $this->hasMany(\App\Models\JustifiedAbsence::class, 'employee_id');
+    }
 }
