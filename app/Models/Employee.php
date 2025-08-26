@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Advance;
+
 
 class Employee extends Model
 {
@@ -164,13 +166,13 @@ class Employee extends Model
     // Relación con los anticipos
     public function anticipos()
     {
-        return $this->hasMany(Anticipo::class);
+        return $this->hasMany(Advance::class);
     }
 
 
     // Relación: Un empleado puede tener muchas ausencias justificadas
     public function justifiedAbsences()
     {
-        return $this->hasMany(\App\Models\JustifiedAbsence::class, 'employee_id');
+        return $this->hasMany(JustifiedAbsence::class, 'employee_id');
     }
 }
