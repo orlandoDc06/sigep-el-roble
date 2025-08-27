@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('titulo', 'Panel de Administración')
-
+    <a class="" href="{{ route('special-days.index') }}">Configuración</a>
 @section('contenido')
     <div class="bg-white p-6 rounded-lg shadow">
         <h3 class="text-xl font-bold mb-4 text-green-700">Bienvenido al Panel de Administración</h3>

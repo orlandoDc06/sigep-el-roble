@@ -411,6 +411,16 @@ Route::middleware('auth')->group(function() {
     Route::get('/employees/{employeeId}/infoAsistencias', InfoEmployee::class)
         ->name('employee.infoAsistencias');
 
+    //Rutas de Special Days
+    Route::middleware(['auth'])->group(function() {
+        Route::get('/special-days', \App\Livewire\SpecialDays\Index::class)
+            ->name('special-days.index');
+        Route::get('/special-days/create', \App\Livewire\SpecialDays\Create::class)
+            ->name('special-days.create');
+        Route::get('/special-days/{specialDayId}/edit', \App\Livewire\SpecialDays\Edit::class)
+            ->name('special-days.edit');
+    });
+
 // Rutas de ausencias justificadas para empleados
 Route::middleware(['auth'])->group(function() {
     Route::get('/ausencias-justificadas', function() {
@@ -426,4 +436,3 @@ Route::middleware(['auth'])->group(function() {
         return app(JustifiedAbsenceList::class)();
     })->name('admin.justified-absences');
 });
-
