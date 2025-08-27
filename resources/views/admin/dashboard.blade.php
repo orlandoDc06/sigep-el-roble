@@ -27,6 +27,13 @@
         <!-- Botón para gestion de anticipos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('advances.index') }}"> Anticipos</a></button>
 
+        <!-- Botón para fórmulas de pago -->
+       <button class="bg-green-500 text-white px-4 py-2 rounded">
+    <a href="{{ route('admin.legal-configurations.index') }}"> Configuraciones Legales</a>
+</button>
+<button class="bg-green-500 text-white px-4 py-2 rounded">
+    <a href="{{ route('admin.formulas.index') }}"> Fórmulas</a>
+</button>
     </div>
 
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('admin.roles.index') }}"> Roles y permisos</a></button>
