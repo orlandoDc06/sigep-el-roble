@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Livewire\Component;
 use App\Models\Employee;
 use App\Models\Shift;
+use App\Models\EmployeeShiftAssignment;
+use App\Models\ExtraHour;
 
 class Attendance extends Model
 {
@@ -51,5 +53,21 @@ class Attendance extends Model
     {
         return $this->belongsTo(Shift::class);
     }
-
+    // Relación con horas extras
+    public function extraHours()
+    {
+        return $this->hasMany(ExtraHour::class, 'employee_id', 'employee_id')
+                    ->whereDate('date', $this->check_in_time->toDateString());
+    }
+    // Obtener el total de horas extras para esta asistencia
+    public function getExtraHoursTotalAttribute()
+    {
+        if (!$this->check_in_time) return '0 hrs';
+        
+        $total = ExtraHour::where('employee_id', $this->employee_id)
+                        ->whereDate('date', $this->check_in_time->toDateString())
+                        ->sum('hours');
+        
+        return $total > 0 ? number_format($total, 1) . ' hrs' : '0 hrs';
+    }
 }

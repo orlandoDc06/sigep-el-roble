@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,6 +8,7 @@ use Carbon\Carbon;
 
 class SpecialDay extends Model
 {
+    //
     use HasFactory;
     // Atributos asignables
     protected $fillable = [

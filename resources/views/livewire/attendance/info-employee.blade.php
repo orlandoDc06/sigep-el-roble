@@ -55,12 +55,6 @@
                 </p>
                 <p class="text-sm text-green-800">Asistencias registradas</p>
             </div>
-            <div class="bg-gray-50 p-4 rounded-lg text-center">
-                <p class="text-2xl font-bold text-gray-600">
-                    {{ $employee->hire_date ? Carbon\Carbon::parse($employee->hire_date)->diffInDays(now()) : 'N/A' }}
-                </p>
-                <p class="text-sm text-gray-800">Días en la empresa</p>
-            </div>
         </div>
 
         <!-- Tabla de asistencias -->
@@ -72,9 +66,6 @@
                             Fecha
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Hora de entrada
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Turno
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -83,6 +74,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Tipo
                         </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horas extras</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -94,11 +86,6 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
                                     {{ $attendance->check_in_time ? $attendance->check_in_time->format('d/m/Y') : 'N/A' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $attendance->check_in_time ? $attendance->check_in_time->format('H:i:s') : 'No registrada' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -115,6 +102,11 @@
                                 <span class="text-sm text-gray-900">
                                     {{ $attendance->is_manual_entry ? 'Manual' : 'Automático' }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    {{ $attendance->extra_hours_total }}
+                                </div>
                             </td>
                         </tr>
                     @empty
