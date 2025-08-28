@@ -28,18 +28,25 @@ use App\Livewire\Shifts\ShiftsForm;
 use App\Livewire\Bonuses\BonusesIndex;
 use App\Livewire\Bonuses\BonusesForm;
 
+<<<<<<< Updated upstream
 use App\Livewire\Advances\AdvancesIndex;
 use App\Livewire\Advances\AdvancesForm;
 use App\Livewire\Advances\AdvancesEdit;
+=======
+use App\Livewire\ChangeLogs\ChangeLogsIndex;
+>>>>>>> Stashed changes
 
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentIndex;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentForm;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentEdit;
 
+<<<<<<< Updated upstream
 use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentIndex;
 use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentForm;
 use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentEdit;
 
+=======
+>>>>>>> Stashed changes
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
 use App\Http\Controllers\ProfileController;
@@ -143,6 +150,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/advances/{id}/edit', AdvancesEdit::class)->name('advances.edit');
 });
 
+// Ruta para la bitácora de cambios
+Route::middleware(['auth'])->group(function () {
+    Route::get('/change-logs', ChangeLogsIndex::class)
+        ->name('change-logs.index');
+    });
 
 // Rutas públicas
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');

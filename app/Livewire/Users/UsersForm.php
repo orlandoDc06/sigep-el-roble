@@ -114,13 +114,14 @@ class UsersForm extends Component
 
         $this->validate();
 
-        try {
-            // Subir imagen si existe
-            $imagePath = null;
-            if ($this->profile_image) {
-                $imagePath = $this->profile_image->store('profile-images', 'public');
-            }
+        // Subir imagen si hay
+        $imagePath = null;
+        if ($this->profile_image) {
+            $imagePath = $this->profile_image->store('profile-images', 'public');
+        }
 
+
+        try {          
             // Crear usuario
             $user = User::create([
                 'name' => trim($this->name),
@@ -195,6 +196,23 @@ class UsersForm extends Component
                 $user->syncRoles(['Administrador']);
             }
 
+            // Verificar si cambió el status
+            if ($user->status !== $this->status) {
+                ChangeLog::create([
+                    'model'         => User::class,
+                    'model_id'      => $user->id,
+                    'field_changed' => 'status',
+                    'old_value'     => $user->status,   // valor anterior
+                    'new_value'     => $this->status,   // valor nuevo
+                    'changed_by'    => Auth::id(),      // usuario que hace el cambio
+                    'changed_at'    => now(),
+                ]);
+            }
+
+            // Luego actualizas el usuario
+            $user->update([
+                'status' => $this->status,
+            ]);
             session()->flash('message', 'Usuario actualizado exitosamente.');
             return redirect()->route('users.index');
 

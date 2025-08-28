@@ -1,10 +1,9 @@
 <div class="p-4 space-y-4">
     <h1 class="text-2xl font-bold">Lista de usuarios</h1>
     <a href="{{ route('users.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Crear usuario</a>
-    <br><br>
 
     {{-- Barra de búsqueda --}}
-    <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+    <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center mt-4">
         <input 
             type="text" 
             wire:model.defer="search" 
@@ -14,8 +13,8 @@
         >
         <button wire:click="applySearch" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Buscar</button>
         <button wire:click="resetSearch" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Eliminar filtro</button>
-       
-        {{-- Select con wire:change para filtro automático --}}
+
+        {{-- Filtro por rol --}}
         <select wire:model="filterRole" wire:change="loadUsers" class="border border-gray-300 rounded px-3 py-2">
             <option value="all">Todos los roles</option>
             <option value="Administrador">Administrador</option>
@@ -24,16 +23,16 @@
         </select>
     </div>
 
-    <hr class="border-gray-300">
+    <hr class="border-gray-300 mt-2">
 
-    {{-- Debug temporal - puedes eliminar después --}}
+    {{-- Debug temporal --}}
     <div class="text-xs text-gray-500">
         Filtro actual: {{ $filterRole }} | Total usuarios: {{ $users->count() }}
     </div>
 
     @if($users->count())
         <div class="overflow-x-auto">
-            <table class="min-w-full border border-gray-300 text-sm">
+            <table class="min-w-full border border-gray-300 text-sm mt-2">
                 <thead class="bg-gray-100">
                     <tr>
                         <th class="border px-4 py-2 text-left">Nombre</th>
@@ -50,41 +49,29 @@
                             <td class="border px-4 py-2">{{ $user->name }}</td>
                             <td class="border px-4 py-2">{{ $user->email }}</td>
                             <td class="border px-4 py-2">
-                                @php
-                                    $userRole = $this->getUserRole($user);
-                                @endphp
-
+                                @php $userRole = $this->getUserRole($user); @endphp
                                 @if($userRole)
                                     <span class="px-2 py-1 rounded-full text-xs font-medium
-                                        @if($userRole === 'Administrador')
-                                            bg-red-100 text-red-800
-                                        @elseif($userRole === 'Supervisor')
-                                            bg-green-100 text-green-800
-                                        @elseif($userRole === 'Empleado')
-                                            bg-blue-100 text-blue-800
-                                        @else
-                                            bg-purple-100 text-purple-800
-                                        @endif
-                                    ">
+                                        @if($userRole === 'Administrador') bg-red-100 text-red-800
+                                        @elseif($userRole === 'Supervisor') bg-green-100 text-green-800
+                                        @elseif($userRole === 'Empleado') bg-blue-100 text-blue-800
+                                        @else bg-purple-100 text-purple-800
+                                        @endif">
                                         {{ $userRole }}
                                     </span>
                                 @else
-                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                        Sin rol asignado
-                                    </span>
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Sin rol asignado</span>
                                 @endif
                             </td>
                             <td class="border px-4 py-2">
-                                @if ($user->profile_image_path)
-                                    <img src="{{ Storage::url($user->profile_image_path) }}" alt="Perfil" class="w-12 h-12 rounded-full object-cover">
+                                @if($user->profile_image_path)
+                                    <img src="{{ asset('storage/' . $user->profile_image_path) }}" alt="Foto de perfil" class="w-12 h-12 rounded-full object-cover">
                                 @else
-                                    <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                                        <span class="text-gray-600 text-xs">Sin foto</span>
-                                    </div>
+                                    <span>Sin foto</span>
                                 @endif
                             </td>
                             <td class="border px-4 py-2">
-                                @if ($user->is_active)
+                                @if($user->is_active)
                                     <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Activo</span>
                                 @else
                                     <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Inactivo</span>
@@ -93,45 +80,31 @@
                             <td class="border px-4 py-2 space-x-2">
                                 {{-- Botón Editar --}}
                                 @can('editar usuarios')
-                                    <a href="#" wire:click.prevent="editUser({{ $user->id }})" 
-                                       class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-                                        Editar
-                                    </a>
+                                    @if($userRole === 'Empleado')
+                                        @if($user->employee)
+                                            <a href="{{ route('employees.edit-live', $user->employee->id) }}" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Editar</a>
+                                        @else
+                                            <a href="#" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Editar</a>
+                                        @endif
+                                    @else
+                                        <a href="#" wire:click.prevent="editUser({{ $user->id }})" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Editar</a>
+                                    @endif
                                 @endcan
 
-                                {{-- Boton Activar: Solo para usuarios INACTIVOS --}}
+                                {{-- Botón Activar solo para inactivos --}}
                                 @can('editar usuarios')
-                                    @if (!$user->is_active)
-                                        <button onclick="confirm('¿Seguro que deseas activar este usuario?') || event.stopImmediatePropagation()" 
-                                                wire:click="toggleUserStatus({{ $user->id }})" 
-                                                class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-                                            Activar
-                                        </button>
+                                    @if(!$user->is_active)
+                                        <button wire:click="confirmActivation({{ $user->id }})" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Activar</button>
                                     @endif
                                 @endcan
 
-                                {{-- Botón Estado: SOLO para usuarios ACTIVOS (o propio usuario deshabilitado) --}}
+                                {{-- Botón Estado para activos o propio usuario --}}
                                 @can('estado usuarios')
-                                    @if ($user->isSelf)
-                                        {{-- Propio usuario: siempre deshabilitado --}}
-                                        <a href="#" 
-                                           onclick="alert('⚠ No puedes modificar tu propio estado.'); event.preventDefault();" 
-                                           class="cursor-not-allowed opacity-50 bg-gray-400 px-3 py-1 rounded text-white">
-                                            Estado
-                                        </a>
-                                    @elseif ($user->is_active)
-                                        {{-- Usuario ACTIVO: mostrar botón Estado para desactivar --}}
-                                        <a href="#" wire:click.prevent="editStatus({{ $user->id }})" 
-                                           class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                                            Estado
-                                        </a>
+                                    @if($user->isSelf)
+                                        <a href="#" onclick="alert('⚠ No puedes modificar tu propio estado.'); event.preventDefault();" class="cursor-not-allowed opacity-50 bg-gray-400 px-3 py-1 rounded text-white">Estado</a>
+                                    @elseif($user->is_active)
+                                        <a href="#" wire:click.prevent="editStatus({{ $user->id }})" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Estado</a>
                                     @endif
-                                    {{-- Usuario INACTIVO: NO mostrar botón Estado (ya tiene Activar) --}}
-                                @endcan
-
-                                {{-- Botón Eliminar --}}
-                                @can('eliminar usuarios')
-                                    
                                 @endcan
                             </td>
                         </tr>
@@ -141,5 +114,22 @@
         </div>
     @else
         <p class="text-gray-600 italic">No hay usuarios disponibles con los filtros aplicados.</p>
+    @endif
+
+    {{-- Modal de activación --}}
+    @if($confirmingActivation)
+        @php $userToActivateData = $users->firstWhere('id', $userToActivate); @endphp
+        <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+                <h3 class="text-lg font-bold mb-4">Activar Usuario</h3>
+                <p class="mb-4">
+                    ¿Seguro que deseas activar al usuario <strong>{{ $userToActivateData->name ?? '' }}</strong>? Esta acción no se puede deshacer.
+                </p>
+                <div class="flex justify-end space-x-2">
+                    <button wire:click="$set('confirmingActivation', false)" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
+                    <button wire:click="activateUser" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Confirmar</button>
+                </div>
+            </div>
+        </div>
     @endif
 </div>

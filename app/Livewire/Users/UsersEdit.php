@@ -5,8 +5,8 @@ namespace App\Livewire\Users;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\User;
+use App\Models\ChangeLog;
 use Illuminate\Support\Facades\Storage;
-
 class UsersEdit extends Component
 {
     use WithFileUploads;
@@ -47,6 +47,10 @@ class UsersEdit extends Component
         // Cargar usuario
         $user = User::findOrFail($this->userId);
 
+         // Registrar cambios antes de actualizar
+        $this->logChange($user, 'name', $user->name, $this->name);
+        $this->logChange($user, 'email', $user->email, $this->email);
+
         // Actualizar datos del usuario
         $user->name = $this->name;
         $user->email = $this->email;
@@ -62,9 +66,25 @@ class UsersEdit extends Component
             $user->profile_image_path = $imagePath;
         }
 
+
         $user->save();
         session()->flash('success', 'Usuario actualizado correctamente.');
         return redirect()->route('users.index');
+    }
+
+    protected function logChange($model, $field, $oldValue, $newValue)
+    {
+        if ($oldValue != $newValue) {
+            ChangeLog::create([
+                'model' => get_class($model),
+                'model_id' => $model->id,
+                'field_changed' => $field,
+                'old_value' => $oldValue,
+                'new_value' => $newValue,
+                'changed_by' => auth()->id(),
+                'changed_at' => now(),
+            ]);
+        }
     }
 
     // Método para eliminar la imagen de perfil

@@ -26,6 +26,7 @@
 
         <!-- Botón para gestion de anticipos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('advances.index') }}"> Anticipos</a></button>
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('change-logs.index') }}"> Registro de cambios</a></button>
 
     </div>
 

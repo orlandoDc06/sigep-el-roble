@@ -5,11 +5,12 @@ namespace App\Livewire\Users;
 use Livewire\Component;
 use App\Models\User;
 use App\Models\Employee;
+use App\Models\ChangeLog;
 use Illuminate\Support\Facades\Auth;
 
 class UsersEditEstado extends Component
 {
-    //VARIABLES
+    // VARIABLES
     public $record_id;
     public $status;
     public $name;
@@ -22,6 +23,12 @@ class UsersEditEstado extends Component
      */
     public function mount($record_id)
     {
+        // Validar que el usuario logueado sea administrador
+        if (!Auth::user()->can('editar usuarios')) {
+            session()->flash('error', 'No tienes permisos para editar estados de usuarios.');
+            return redirect()->route('users.index');
+        }
+
         $this->record_id = $record_id;
 
         // Intentar cargar empleado primero
@@ -33,20 +40,19 @@ class UsersEditEstado extends Component
             return;
         }
 
-        // Si no es empleado, cargar usuario
+        // Evitar que el admin edite su propio estado
         if ($record_id == Auth::id()) {
             session()->flash('error', 'No puedes editar tu propio estado.');
             return redirect()->route('users.index');
         }
 
+        // Si no es empleado, cargar usuario
         $user = User::find($record_id);
         if ($user) {
             $this->isUser = true;
             $this->name = $user->name;
             $this->status = $user->is_active ? 'active' : 'inactive';
-
-            // Ajusta esto según tu esquema real de roles
-            $this->isAdmin = isset($user->role) && $user->role === 'admin';
+            $this->isAdmin = $user->hasRole('Administrador');
             return;
         }
 
@@ -56,14 +62,20 @@ class UsersEditEstado extends Component
     }
 
     /**
-     * Actualiza el estado de un usuario.
+     * Actualiza el estado de un registro (usuario o empleado).
      */
     public function updateStatus()
     {
+        // Validar permisos antes de actualizar
+        if (!Auth::user()->can('editar usuarios')) {
+            session()->flash('error', 'No tienes permisos para actualizar estados.');
+            return redirect()->route('users.index');
+        }
+
         if ($this->isUser) {
-            return $this->updateUserStatus();
+            $this->updateUserStatus();
         } elseif ($this->isEmployee) {
-            return $this->updateEmployeeStatus();
+            $this->updateEmployeeStatus();
         } else {
             session()->flash('error', 'Tipo de registro inválido.');
             return redirect()->route('users.index');
@@ -85,10 +97,14 @@ class UsersEditEstado extends Component
         ]);
 
         $user = User::findOrFail($this->record_id);
+
+        $oldValue = $user->is_active;
         $user->is_active = $this->status === 'active' ? 1 : 0;
         $user->save();
 
-        session()->flash('success', 'Estado del administrador actualizado correctamente.');
+        $this->logChange('User', $user->id, 'is_active', $oldValue, $user->is_active);
+
+        session()->flash('success', 'Estado del usuario actualizado correctamente.');
         return redirect()->route('users.index');
     }
 
@@ -97,7 +113,6 @@ class UsersEditEstado extends Component
      */
     private function updateEmployeeStatus()
     {
-        // Elimina espacios antes y después
         $this->status = trim($this->status);
 
         $this->validate([
@@ -105,15 +120,35 @@ class UsersEditEstado extends Component
         ]);
 
         $employee = Employee::findOrFail($this->record_id);
+
+        $oldValue = $employee->status;
         $employee->status = $this->status;
         $employee->save();
+
+        $this->logChange(Employee::class, $employee->id, 'status', $oldValue, $employee->status);
 
         session()->flash('success', 'Estado del empleado actualizado correctamente.');
         return redirect()->route('users.index');
     }
 
     /**
-     * Redirige a la página de índice correspondiente según el tipo de registro.
+     * Función para crear un registro en la bitácora (ChangeLog)
+     */
+    private function logChange($model, $model_id, $field, $oldValue, $newValue)
+    {
+        ChangeLog::create([
+            'model' => $model,
+            'model_id' => $model_id,
+            'field_changed' => $field,
+            'old_value' => $oldValue,
+            'new_value' => $newValue,
+            'changed_by' => Auth::id(),
+            'changed_at' => now(),
+        ]);
+    }
+
+    /**
+     * Redirige a la página de índice según el tipo de registro.
      */
     public function returnIndex()
     {
@@ -121,11 +156,10 @@ class UsersEditEstado extends Component
     }
 
     /**
-     * Funcion para renderizar la vista a editar estado
+     * Renderiza la vista para editar estado.
      */
     public function render()
     {
-        // Pasar isAdmin para la vista
         return view('livewire.users.users-edit-estado', [
             'isAdmin' => $this->isAdmin,
         ]);
