@@ -20,13 +20,14 @@
 
         <!-- Botón para asignar bonos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('bonuses-assignments.index') }}"> Bonos Asignados</a></button>
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('change-logs.index') }}"> Registro de cambios</a></button>
+
 
         <!-- Botón para asignar descuentos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('deductions-assignments.index') }}"> Descuentos Asignados</a></button>
 
         <!-- Botón para gestion de anticipos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('advances.index') }}"> Anticipos</a></button>
-        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('change-logs.index') }}"> Registro de cambios</a></button>
 
     </div>
 
