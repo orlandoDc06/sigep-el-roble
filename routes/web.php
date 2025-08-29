@@ -454,3 +454,34 @@ Route::middleware(['auth'])->group(function() {
         return app(JustifiedAbsenceList::class)();
     })->name('admin.justified-absences');
 });
+//RUTAS PROTEGIDAS PARA FÓRMULAS -- SOLO ADMINISTRADORES
+Route::middleware('auth')->get('/admin/formulas', function() {
+    checkAdmin();
+    return app(\App\Livewire\Formulas\FormulasIndex::class)();
+})->name('admin.formulas.index');
+
+Route::middleware('auth')->get('/admin/formulas/create', function() {
+    checkAdmin();
+    return app(\App\Livewire\Formulas\FormulasForm::class)();
+})->name('admin.formulas.create');
+
+Route::middleware('auth')->get('/admin/formulas/{id}/edit', function($id) {
+    checkAdmin();
+    return app(\App\Livewire\Formulas\FormulasForm::class)(['id' => $id]);
+})->whereNumber('id')->name('admin.formulas.edit');
+
+//RUTAS PROTEGIDAS PARA CONFIGURACIONES LEGALES -- SOLO ADMINISTRADORES
+Route::middleware('auth')->get('/admin/legal-configurations', function() {
+    checkAdmin();
+    return app(\App\Livewire\LegalConfigurations\LegalConfigurationIndex::class)();
+})->name('admin.legal-configurations.index');
+
+Route::middleware('auth')->get('/admin/legal-configurations/create', function() {
+    checkAdmin();
+    return app(\App\Livewire\LegalConfigurations\LegalConfigurationForm::class)();
+})->name('admin.legal-configurations.create');
+
+Route::middleware('auth')->get('/admin/legal-configurations/{id}/edit', function($id) {
+    checkAdmin();
+    return app(\App\Livewire\LegalConfigurations\LegalConfigurationForm::class)(['id' => $id]);
+})->whereNumber('id')->name('admin.legal-configurations.edit');

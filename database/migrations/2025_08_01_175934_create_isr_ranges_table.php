@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('isr_ranges', function (Blueprint $table) {
             $table->id();
             $table->foreignId('legal_configuration_id')->constrained()->onDelete('cascade');
-            $table->decimal('min_amount', 10, 2);
-            $table->decimal('max_amount', 10, 2)->nullable(); // null para rango abierto superior
-            $table->decimal('percentage', 5, 2); // % aplicado al excedente del mínimo
-            $table->decimal('fixed_fee', 10, 2); // cuota fija según tabla
+            $table->decimal('min_amount', 10, 2)->comment('Monto mínimo del rango');
+            $table->decimal('max_amount', 10, 2)->nullable()->comment('Monto máximo del rango (null = sin límite)');
+            $table->decimal('percentage', 5, 2)->comment('Porcentaje a aplicar');
+            $table->decimal('fixed_fee', 10, 2)->default(0)->comment('Cuota fija del rango');
             $table->timestamps();
+
+            // Índices
+            $table->index(['legal_configuration_id', 'min_amount']);
         });
     }
 
