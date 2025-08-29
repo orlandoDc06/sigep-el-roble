@@ -10,6 +10,8 @@ use App\Models\ContractType;
 use App\Models\Shift;
 use Spatie\Permission\Models\Role;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use App\Models\ChangeLog;
 
 class EditEmployee extends Component
 {
@@ -107,6 +109,9 @@ class EditEmployee extends Component
             $this->photo_path = $path;
         }
 
+        // Guardamos valores viejos antes de actualizar
+        $oldValues = $this->employee->getOriginal();
+
         $this->employee->update([
             'first_name'        => $this->first_name,
             'last_name'         => $this->last_name,
@@ -125,17 +130,48 @@ class EditEmployee extends Component
             'contract_type_id'  => $this->contract_type_id,
         ]);
 
-        // 🔹 SOLUCIÓN: Sincronizar turnos con fechas usando attach/detach
+        // 🔹 Detectar cambios en Employee y guardarlos en la bitácora
+        foreach ($this->employee->getChanges() as $field => $newValue) {
+            if ($field === 'updated_at') continue; // ignorar timestamps
+
+            ChangeLog::create([
+                'model'         => 'Employee',
+                'model_id'      => $this->employee->id,
+                'field_changed' => $field,
+                'old_value'     => $oldValues[$field] ?? null,
+                'new_value'     => $newValue,
+                'changed_by'    => Auth::id(),
+                'changed_at'    => now(),
+            ]);
+        }
+
+        //  Sincronizar turnos con fechas
         $this->syncEmployeeShifts();
 
-        // 🔹 actualizar usuario asociado
+        //  Actualizar usuario asociado y registrar cambios
         if ($this->employee->user) {
             $user = $this->employee->user;
+            $oldUserValues = $user->getOriginal();
+
             $user->name = $this->first_name . ' ' . $this->last_name;
             $user->email = $this->email;
             $user->profile_image_path = $this->photo_path;
             $user->is_active = $this->status === 'active';
             $user->save();
+
+            foreach ($user->getChanges() as $field => $newValue) {
+                if ($field === 'updated_at') continue;
+
+                ChangeLog::create([
+                    'model'         => 'User',
+                    'model_id'      => $user->id,
+                    'field_changed' => $field,
+                    'old_value'     => $oldUserValues[$field] ?? null,
+                    'new_value'     => $newValue,
+                    'changed_by'    => Auth::id(),
+                    'changed_at'    => now(),
+                ]);
+            }
         }
 
         session()->flash('message', 'Empleado actualizado correctamente.');
@@ -171,6 +207,19 @@ class EditEmployee extends Component
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ];
+        }
+
+        // 🔹 Antes de sincronizar, registramos en bitácora
+        foreach ($shiftsData as $shiftId => $pivotData) {
+            ChangeLog::create([
+                'model'         => 'EmployeeShift',
+                'model_id'      => $this->employee->id,
+                'field_changed' => 'shift_assignment',
+                'old_value'     => 'Turnos previos eliminados',
+                'new_value'     => 'Asignado turno ID ' . $shiftId . ' desde ' . $pivotData['start_date'] . ' hasta ' . ($pivotData['end_date'] ?? 'indefinido'),
+                'changed_by'    => Auth::id(),
+                'changed_at'    => now(),
+            ]);
         }
 
         // Sincronizar con datos pivot

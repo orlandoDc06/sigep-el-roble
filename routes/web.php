@@ -31,14 +31,18 @@ use App\Livewire\Bonuses\BonusesForm;
 use App\Livewire\Advances\AdvancesIndex;
 use App\Livewire\Advances\AdvancesForm;
 use App\Livewire\Advances\AdvancesEdit;
+use App\Livewire\ChangeLogs\ChangeLogsIndex;
+
 
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentIndex;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentForm;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentEdit;
 
+
 use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentIndex;
 use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentForm;
 use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentEdit;
+
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
@@ -136,6 +140,8 @@ Route::middleware('auth')->group(function () {
 
 });
 
+
+
 //Rutas protegidas para anticipos
 Route::middleware('auth')->group(function () {
     Route::get('/advances', AdvancesIndex::class)->name('advances.index');
@@ -143,6 +149,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/advances/{id}/edit', AdvancesEdit::class)->name('advances.edit');
 });
 
+
+// Ruta para la bitácora de cambios
+Route::middleware(['auth'])->group(function () {
+    Route::get('/change-logs', ChangeLogsIndex::class)
+        ->name('change-logs.index');
+    });
+
+// Ruta para la bitácora de cambios
+Route::middleware(['auth'])->group(function () {
+    Route::get('/change-logs', ChangeLogsIndex::class)
+        ->name('change-logs.index');
+    });
 
 // Rutas públicas
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
