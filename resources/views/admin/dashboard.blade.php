@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('titulo', 'Panel de Administración')
-
+<a href="{{ route('branches.index') }}" class="text-sm text-gray-600 hover:underline font-semibold uppercase"> 
+    Configuración
+</a>
 @section('contenido')
     <div class="bg-white p-6 rounded-lg shadow">
         <h3 class="text-xl font-bold mb-4 text-green-700">Bienvenido al Panel de Administración</h3>
@@ -20,6 +22,8 @@
 
         <!-- Botón para asignar bonos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('bonuses-assignments.index') }}"> Bonos Asignados</a></button>
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('change-logs.index') }}"> Registro de cambios</a></button>
+
 
         <!-- Botón para asignar descuentos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('deductions-assignments.index') }}"> Descuentos Asignados</a></button>

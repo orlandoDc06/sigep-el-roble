@@ -31,14 +31,18 @@ use App\Livewire\Bonuses\BonusesForm;
 use App\Livewire\Advances\AdvancesIndex;
 use App\Livewire\Advances\AdvancesForm;
 use App\Livewire\Advances\AdvancesEdit;
+use App\Livewire\ChangeLogs\ChangeLogsIndex;
+
 
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentIndex;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentForm;
 use App\Livewire\EmployeeBunusAssigments\EmployeeBonusAssignmentEdit;
 
+
 use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentIndex;
 use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentForm;
 use App\Livewire\EmployeeDeductionsAssignments\EmployeeDeductionAssignmentEdit;
+
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
@@ -136,6 +140,8 @@ Route::middleware('auth')->group(function () {
 
 });
 
+
+
 //Rutas protegidas para anticipos
 Route::middleware('auth')->group(function () {
     Route::get('/advances', AdvancesIndex::class)->name('advances.index');
@@ -143,6 +149,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/advances/{id}/edit', AdvancesEdit::class)->name('advances.edit');
 });
 
+
+// Ruta para la bitácora de cambios
+Route::middleware(['auth'])->group(function () {
+    Route::get('/change-logs', ChangeLogsIndex::class)
+        ->name('change-logs.index');
+    });
+
+// Ruta para la bitácora de cambios
+Route::middleware(['auth'])->group(function () {
+    Route::get('/change-logs', ChangeLogsIndex::class)
+        ->name('change-logs.index');
+    });
 
 // Rutas públicas
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
@@ -411,6 +429,16 @@ Route::middleware('auth')->group(function() {
     Route::get('/employees/{employeeId}/infoAsistencias', InfoEmployee::class)
         ->name('employee.infoAsistencias');
 
+    //Rutas de Special Days
+    Route::middleware(['auth'])->group(function() {
+        Route::get('/special-days', \App\Livewire\SpecialDays\Index::class)
+            ->name('special-days.index');
+        Route::get('/special-days/create', \App\Livewire\SpecialDays\Create::class)
+            ->name('special-days.create');
+        Route::get('/special-days/{specialDayId}/edit', \App\Livewire\SpecialDays\Edit::class)
+            ->name('special-days.edit');
+    });
+
 // Rutas de ausencias justificadas para empleados
 Route::middleware(['auth'])->group(function() {
     Route::get('/ausencias-justificadas', function() {
@@ -442,7 +470,7 @@ Route::middleware('auth')->get('/admin/formulas/{id}/edit', function($id) {
     return app(\App\Livewire\Formulas\FormulasForm::class)(['id' => $id]);
 })->whereNumber('id')->name('admin.formulas.edit');
 
-//RUTAS PROTEGIDAS PARA CONFIGURACIONES LEGALES -- SOLO ADMINISTRADORES  
+//RUTAS PROTEGIDAS PARA CONFIGURACIONES LEGALES -- SOLO ADMINISTRADORES
 Route::middleware('auth')->get('/admin/legal-configurations', function() {
     checkAdmin();
     return app(\App\Livewire\LegalConfigurations\LegalConfigurationIndex::class)();
