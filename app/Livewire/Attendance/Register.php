@@ -6,16 +6,30 @@ use Livewire\Component;
 use App\Models\Employee;
 use App\Models\Attendance;
 use App\Models\Shift;
+use App\Models\ExtraHour;
 use Carbon\Carbon;
 
 class Register extends Component
 {
     public $employeeId, $employee, $attendanceType = 'on_time', $notes = '', $selectedShift, $shifts = [];
-
+    public $hasOvertime = false, $regularOvertime = 0, $doubleOvertime = 0, $overtimeType = '', $overtimeNotes = '';
+    
     protected $rules = [
         'attendanceType' => 'required|in:on_time,late,absent',
         'notes' => 'nullable|string|max:500',
-        'selectedShift' => 'nullable|exists:shifts,id'
+        'selectedShift' => 'nullable|exists:shifts,id',
+        'hasOvertime' => 'boolean',
+        'regularOvertime' => 'required_if:hasOvertime,true|integer|min:0|max:12',
+        'doubleOvertime' => 'required_if:hasOvertime,true|integer|min:0|max:12',
+        'overtimeType' => 'required_if:hasOvertime,true|in:diurnas,nocturnas,mixtas',
+        'overtimeNotes' => 'nullable|string|max:500',
+    ];
+
+    protected $messages = [
+        'regularOvertime.required_if' => 'Las horas extras normales son requeridas cuando se registran horas extras.',
+        'doubleOvertime.required_if' => 'Las horas extras dobles son requeridas cuando se registran horas extras.',
+        'overtimeType.required_if' => 'El tipo de horas extras es requerido cuando se registran horas extras.',
+        'attendanceType.required' => 'El tipo de asistencia es obligatorio.',
     ];
 
     public function mount($employeeId)
@@ -36,6 +50,15 @@ class Register extends Component
         
         // Establecer el turno seleccionado
         $this->selectedShift = $currentShift ? $currentShift->id : ($this->shifts->first()?->id);
+    }
+
+    // Método para manejar el cambio del checkbox
+    public function updatedHasOvertime($value)
+    {
+        // Si se desmarca el checkbox, resetear los valores de horas extras
+        if (!$value) {
+            $this->reset(['regularOvertime', 'doubleOvertime', 'overtimeType', 'overtimeNotes']);
+        }
     }
 
     // Registra la asistencia
@@ -66,7 +89,8 @@ class Register extends Component
                     return;
             }
 
-            Attendance::create([
+            // Crear el registro de asistencia
+            $attendance = Attendance::create([
                 'employee_id' => $this->employeeId,
                 'shift_id' => $this->selectedShift,
                 'check_in_time' => $checkInTime,
@@ -75,7 +99,41 @@ class Register extends Component
                 'notes' => $this->notes,
             ]);
 
-            session()->flash('success', 'Asistencia registrada exitosamente para ' . $this->employee->first_name);
+            // Si hay horas extras se guardarlas en la tabla extra_hours
+            if ($this->hasOvertime && ($this->regularOvertime > 0 || $this->doubleOvertime > 0)) {
+                
+                // Guardar horas extras normales
+                if ($this->regularOvertime > 0) {
+                    ExtraHour::create([
+                        'employee_id' => $this->employeeId,
+                        'date' => Carbon::today(),
+                        'hours' => $this->regularOvertime,
+                        'rate_multiplier' => 1.0, // 100%
+                        'approved_by' => auth()->id(),
+                    ]);
+                }
+
+                // Guardar horas extras dobles
+                if ($this->doubleOvertime > 0) {
+                    ExtraHour::create([
+                        'employee_id' => $this->employeeId,
+                        'date' => Carbon::today(),
+                        'hours' => $this->doubleOvertime,
+                        'rate_multiplier' => 2.0, // 200%
+                        'approved_by' => auth()->id(),
+                    ]);
+                }
+
+                session()->flash('info', 'Horas extras registradas correctamente.');
+            }
+
+            $successMessage = 'Asistencia registrada exitosamente para ' . $this->employee->first_name;
+            
+            if ($this->attendanceType === 'late') {
+                $successMessage .= ' (Registro con retraso)';
+            }
+
+            session()->flash('success', $successMessage);
             return redirect()->route('attendances.index');
 
         } catch (\Exception $e) {
@@ -83,8 +141,28 @@ class Register extends Component
         }
     }
 
+    // Método para calcular el total de horas extras
+    public function getTotalOvertimeProperty()
+    {
+        return $this->regularOvertime + $this->doubleOvertime;
+    }
+
+    // Método para resetear completamente las horas extras
+    public function resetOvertime()
+    {
+        $this->reset([
+            'hasOvertime', 
+            'regularOvertime', 
+            'doubleOvertime', 
+            'overtimeType', 
+            'overtimeNotes'
+        ]);
+    }
+
     public function render()
     {
-        return view('livewire.attendance.register');
+        return view('livewire.attendance.register', [
+            'totalOvertime' => $this->totalOvertime,
+        ]);
     }
 }

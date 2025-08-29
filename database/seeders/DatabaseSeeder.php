@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             ContractTypeSeeder::class,
             ShiftSeeder::class,
+            SpecialDaySeeder::class,
         ]);
     }
 }
