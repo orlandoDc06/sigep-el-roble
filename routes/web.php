@@ -56,6 +56,9 @@ use Livewire\Livewire;
 use App\Livewire\Admin\JustifiedAbsenceList;
 use App\Livewire\Employees\JustifiedAbsence\JustifiedAbsenceManager;
 
+use App\Livewire\Payrolls\EmployeeList;
+//use App\Livewire\Payrolls\EmployeeGenerator;
+
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -485,3 +488,10 @@ Route::middleware('auth')->get('/admin/legal-configurations/{id}/edit', function
     checkAdmin();
     return app(\App\Livewire\LegalConfigurations\LegalConfigurationForm::class)(['id' => $id]);
 })->whereNumber('id')->name('admin.legal-configurations.edit');
+
+
+Route::middleware(['auth'])->group(function () {
+    // Lista principal (Livewire)
+    Route::get('/payrolls', EmployeeList::class)
+        ->name('payrolls.index');
+});
