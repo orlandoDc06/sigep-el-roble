@@ -117,7 +117,7 @@
                             <p class="text-gray-600 text-sm ml-2">Sucursales, turnos y roles del sistema</p>
                         </div>
                     </div>
-                    
+    
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <a href="{{ route('branches.index') }}" 
                            class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
@@ -181,7 +181,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <a href="{{ route('bonuses.index') }}" 
                            class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
@@ -193,6 +193,21 @@
                                 <div>
                                     <p class="font-medium text-gray-900">Bonos</p>
                                     <p class="text-xs text-gray-500">Gestionar bonificaciones</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('special-days.index') }}" 
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-orange-600 p-2 rounded-lg group-hover:bg-orange-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 011 1v1h6V3a1 1 0 112 0v1h1a2 2 0 012 2v1H3V6a2 2 0 012-2h1V3a1 1 0 011-1zM3 9h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm4 2a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                                </svg>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Dias Festivos</p>
+                                    <p class="text-xs text-gray-500"></p>
                                 </div>
                             </div>
                         </a>
