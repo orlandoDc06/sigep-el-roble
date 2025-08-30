@@ -2,7 +2,7 @@
     <h2 class="text-2xl font-semibold text-gray">Editar sucursal</h2>
 
     @if (session()->has('success'))
-        <div class="bg-verde-sigep text-white px-4 py-2 rounded">
+        <div class="bg-green-600 text-white px-4 py-2 rounded">
             {{ session('success') }}
         </div>
     @endif
@@ -54,7 +54,7 @@
         </div>
 
         <div class="flex justify-center space-x-4 ">
-            <button type="submit" class="bg-verde-sigep hover:bg-verde-sigep-hover transition-colors cursor-pointer text-white px-4 py-2 rounded">
+            <button type="submit" class="bg-green-600 hover:bg-verde-sigep-hover transition-colors cursor-pointer text-white px-4 py-2 rounded">
                 Actualizar
             </button>
 

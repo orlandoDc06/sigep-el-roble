@@ -1,72 +1,83 @@
-<div class="p-4">
+<div class="p-4 space-y-4">
     @if (session()->has('success'))
         <div class="p-4 mb-4 bg-green-100 text-green-800 rounded">
             {{ session('success') }}
         </div>
     @endif
 
-    <div class="flex justify-between items-center mb-4">
+    <h1 class="text-gray text-2xl font-bold">Lista de roles</h1>
+
+    <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
         <input type="text" wire:model.live="search" placeholder="Buscar rol..."
-            class="px-3 py-2 border rounded w-1/3" />
+            class="border border-gray-300 rounded px-3 py-2 w-full sm:w-auto" />
         <button
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
             onclick="window.location.href='{{ route('admin.roles.create') }}'">
             Nuevo Rol
         </button>
     </div>
 
-    <table class="min-w-full bg-white border rounded shadow">
-        <thead>
-            <tr class="bg-gray-100 text-left">
-                <th class="p-2 border-b">Nombre</th>
-                <th class="p-2 border-b">Permisos</th>
-                <th class="p-2 border-b">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($roles as $role)
-                <tr class="hover:bg-gray-50">
-                    <td class="p-2 border-b">{{ $role->name }}</td>
-                    <td class="p-2 border-b">
-                        <button class="text-blue-600 hover:underline" wire:click="showPermissions({{ $role->id }})">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        @forelse ($roles as $role)
+                <div class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200">
+                    <!-- Cabecera con icono y nombre del rol -->
+                    <div class="flex items-start space-x-3 mb-4">
+                        <div class="bg-blue-500 p-2 rounded-lg group-hover:bg-blue-600 transition-colors flex-shrink-0">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-medium text-gray-900 truncate">{{ $role->name }}</h3>
+                            <p class="text-sm text-gray-500 mt-1">
+                                {{ $role->permissions->count() }} 
+                                {{ $role->permissions->count() === 1 ? 'permiso' : 'permisos' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Información de permisos -->
+                    <div class="mb-4">
+                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center" 
+                                wire:click="showPermissions({{ $role->id }})">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
                             Ver permisos
                         </button>
-                    </td>
-                    <td class="p-2 border-b flex space-x-2">
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="flex gap-2 pt-3">
                         <button
-                            class="text-green-600 hover:underline"
+                            class="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-center text-sm hover:bg-blue-700 transition duration-150"
                             wire:click="editRole({{ $role->id }})">
                             Editar
                         </button>
                         <button
-                            class="text-red-600 hover:underline"
+                            class="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition duration-150"
                             wire:click="confirmDelete({{ $role->id }})">
                             Eliminar
                         </button>
-                    </td>
-                </tr>
+                    </div>
+                </div>
             @empty
-                <tr>
-                    <td colspan="4" class="px-6 py-8">
-                        <div class="flex flex-col items-center justify-center text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 text-gray-400" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9.75 9.75h.008v.008H9.75V9.75zm0 4.5h.008v.008H9.75v-.008zm4.5-4.5h.008v.008H14.25V9.75zm0 4.5h.008v.008H14.25v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <p class="text-sm">No se encontraron roles que coincidan con tu búsqueda.</p>
-                        </div>
-                    </td>
-                </tr>
-
-            @endforelse
-        </tbody>
-    </table>
+        <div class="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9.75 9.75h.008v.008H9.75V9.75zm0 4.5h.008v.008H9.75v-.008zm4.5-4.5h.008v.008H14.25V9.75zm0 4.5h.008v.008H14.25v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="mt-4 text-gray-600 italic">No se encontraron roles que coincidan con tu búsqueda.</p>
+        </div>
+    @endforelse
 
     <div class="mt-4">
         {{ $roles->links() }}
     </div>
 
+    <!-- Modal de confirmación de eliminación -->
     <div x-data="{ open: @entangle('confirmingRoleDeletion') }">
         <div x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div class="bg-white p-6 rounded shadow-xl max-w-md w-full">

@@ -105,11 +105,11 @@
                                             <a href="{{ route('attendance.edit', ['attendanceId' => $attendance['attendance_id']]) }}" class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm hover:bg-blue-200" title="Editar">Editar</a>
                                         </div>
                                     @else
-                                        <button class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm hover:bg-gray-200" wire:click="redirigirRegistro({{ $employee->id }})" title="Registrar Asistencia">Registrar Asistencia</button>
+                                        <button class="px-2 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-600" wire:click="redirigirRegistro({{ $employee->id }})" title="Registrar Asistencia">Registrar Asistencia</button>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">
-                                        <button wire:click="redirigirInfoAsistencias({{ $employee->id }})" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                                        <button wire:click="redirigirInfoAsistencias({{ $employee->id }})" class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors">
                                             Ver mas
                                         </button>
                                 </td>

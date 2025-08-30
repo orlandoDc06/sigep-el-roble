@@ -15,11 +15,11 @@
     <div class="flex items-center space-x-2">
         <input type="text"
                wire:model.defer="search"
-               placeholder="Buscar por empleado, apellido o DNI..."
+               placeholder="Buscar por empleado"
                class="border rounded px-3 py-2 w-full focus:outline-none focus:ring focus:ring-indigo-300">
 
         <button wire:click="applySearch"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
             Buscar
         </button>
 
