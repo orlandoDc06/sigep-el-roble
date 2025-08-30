@@ -30,7 +30,10 @@
 
         <!-- Botón para gestion de anticipos -->
         <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('advances.index') }}"> Anticipos</a></button>
-
+        
+        <!-- Botón para gestion de planillas -->
+        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('payrolls.index') }}"> Planillas</a></button>
+        
         <!-- Botón para fórmulas de pago -->
        <button class="bg-green-500 text-white px-4 py-2 rounded">
     <a href="{{ route('admin.legal-configurations.index') }}"> Configuraciones Legales</a>
