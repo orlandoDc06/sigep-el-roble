@@ -56,8 +56,7 @@ use Livewire\Livewire;
 use App\Livewire\Admin\JustifiedAbsenceList;
 use App\Livewire\Employees\JustifiedAbsence\JustifiedAbsenceManager;
 
-use App\Livewire\Payrolls\EmployeeList;
-//use App\Livewire\Payrolls\EmployeeGenerator;
+use App\Http\Controllers\PayrollController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -489,9 +488,28 @@ Route::middleware('auth')->get('/admin/legal-configurations/{id}/edit', function
     return app(\App\Livewire\LegalConfigurations\LegalConfigurationForm::class)(['id' => $id]);
 })->whereNumber('id')->name('admin.legal-configurations.edit');
 
+// Ruta principal: listado de empleados con estado de planilla
+Route::middleware('auth')->group(function () {    
+    
+    //Listado de planillas (vista con Livewire)
+    Route::get('/payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
 
-Route::middleware(['auth'])->group(function () {
-    // Lista principal (Livewire)
-    Route::get('/payrolls', EmployeeList::class)
-        ->name('payrolls.index');
+    //Generar planilla individual (lleva al detalle antes de confirmar)
+    Route::get('/payrolls/generate/{employee}', [PayrollController::class, 'generate'])
+        ->name('payrolls.generate');
+
+    //Guardar/generar planilla individual (POST desde confirmación)
+    Route::post('/payrolls/generate/{employee}', [PayrollController::class, 'store'])
+        ->name('payrolls.store');
+
+    //Ver detalle de planilla ya generada
+    Route::get('/payrolls/{payroll}', [PayrollController::class, 'show'])
+        ->name('payrolls.show');
+
+    Route::post('/payrolls/generate-all', [PayrollController::class, 'generateAll'])
+        ->name('payrolls.generateAll');
+
+    //Actualizar estado (approved, paid, etc.)
+    Route::patch('/payrolls/{payroll}/status', [PayrollController::class, 'updateStatus'])
+        ->name('payrolls.updateStatus');
 });

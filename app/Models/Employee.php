@@ -175,4 +175,33 @@ class Employee extends Model
     {
         return $this->hasMany(JustifiedAbsence::class, 'employee_id');
     }
+
+    // Employee.php
+    public function payrollDetails()
+    {
+        return $this->hasMany(PayrollDetail::class);
+    }
+
+    // PayrollDetail.php
+    public function payroll()
+    {
+        return $this->belongsTo(Payroll::class);
+    }
+
+    public function payrollForPeriod($start, $end)
+    {
+        return $this->payrollDetails()
+            ->whereHas('payroll', function($q) use ($start, $end) {
+                $q->where('period_start', $start)
+                ->where('period_end', $end);
+            })
+            ->with('payroll')
+            ->first();
+    }
+
+    public function extraHours()
+    {
+        return $this->hasMany(ExtraHour::class);
+    }
+
 }
