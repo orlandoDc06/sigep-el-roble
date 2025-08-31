@@ -23,6 +23,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_image_path', 
+        'is_active',          
+        'last_login_at',  
     ];
 
     /**
@@ -46,5 +49,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relación con el modelo Employee.
+     */
+    public function employee()
+    {
+        return $this->hasOne(Employee::class);
     }
 }

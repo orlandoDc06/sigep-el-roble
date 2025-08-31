@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+
+@layer base {
+    :root {
+        --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+            'Segoe UI Symbol', 'Noto Color Emoji';
+    }
+}
+
+@layer utilities {
+    .bg-verde-sigep {
+        background-color: #247328;
+    }
+    .hover\:bg-verde-sigep-hover:hover {
+        background-color: #1e5e22;
+    }
+
+    .text-verde-sigep {
+        color: #247328;
+    }
+    .bg-rojo{
+        background-color: #dc2626;
+    }
+    .hover\:bg-rojo-hover:hover {
+        background-color: #b91c1c;
+    }
+    .bg-azul-sigep {
+        background-color: #2563eb;
+    }
+    .hover\:bg-azul-sigep-hover:hover {
+        background-color: #1d4ed8;  
+        border-color: #1d4ed8;
+    }
+    .bg-gray {
+        background-color: #4b5563;
+    }
+    .hover\:bg-gray:hover {
+        background-color: #374151;
+        border-color: #374151;
+    }
+    .bg-amarillo-sigep {
+        background-color: #f59e0b;
+    }
+    .hover\:bg-amarillo-sigep-hover:hover {
+        background-color: #d97706;
+        border-color: #d97706;
+    }
+}

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->date('date');
             $table->boolean('is_paid')->default(true);
+            $table->boolean('recurring')->default(true);
             $table->timestamps();
         });
     }
