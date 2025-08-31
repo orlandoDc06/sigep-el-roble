@@ -16,19 +16,22 @@ use App\Models\ChangeLog;
 class EditEmployee extends Component
 {
     use WithFileUploads;
+
     public Employee $employee;
 
     public $first_name, $last_name, $dui, $phone, $address;
     public $birth_date, $hire_date, $termination_date, $gender, $marital_status, $status, $photo_path;
     public $user_id, $branch_id, $contract_type_id, $email;
 
+    // Campos para turnos
     public $shift1_id;
     public $shift2_id;
-    
-    // Agregar campos para las fechas de turnos
     public $shift1_start_date;
     public $shift2_start_date;
     public $shift2_end_date;
+
+    // AGREGAR este campo que faltaba
+    public $shift_id;
 
     public $selectedRoles;
     public $branches, $contractTypes, $shifts, $roles;
@@ -38,6 +41,7 @@ class EditEmployee extends Component
     {
         $this->employee = $employee;
 
+        // Cargar todos los campos básicos
         $this->first_name = $employee->first_name;
         $this->last_name = $employee->last_name;
         $this->dui = $employee->dui;
@@ -55,23 +59,37 @@ class EditEmployee extends Component
         $this->contract_type_id = $employee->contract_type_id;
         $this->email = $employee->user ? $employee->user->email : null;
 
-        // Obtener turnos actuales del empleado usando la relación shifts existente
-        $employeeShifts = $employee->shifts()->withPivot('start_date', 'end_date')->orderBy('employee_shift_assignments.start_date')->get();
+        // AGREGAR: Obtener el turno principal actual del empleado (para compatibilidad con vista simple)
+        $currentShift = $employee->shifts()
+            ->withPivot('start_date', 'end_date')
+            ->wherePivot('end_date', null)
+            ->orderBy('employee_shift_assignments.start_date')
+            ->first();
+
+        $this->shift_id = $currentShift ? $currentShift->id : null;
+
+        // Obtener turnos para el sistema de múltiples turnos
+        $employeeShifts = $employee->shifts()
+            ->withPivot('start_date', 'end_date')
+            ->orderBy('employee_shift_assignments.start_date')
+            ->get();
+
         $this->shift1_id = $employeeShifts->first()?->id;
         $this->shift2_id = $employeeShifts->skip(1)->first()?->id;
-        
+
         // Obtener fechas de inicio y fin actuales
         $this->shift1_start_date = $employeeShifts->first()?->pivot->start_date;
         $this->shift2_start_date = $employeeShifts->skip(1)->first()?->pivot->start_date;
         $this->shift2_end_date = $employeeShifts->skip(1)->first()?->pivot->end_date;
 
+        // Cargar datos para los selects
         $this->branches = Branch::all();
         $this->contractTypes = ContractType::all();
         $this->shifts = Shift::all();
         $this->roles = Role::all();
 
         $this->selectedRoles = $employee->user ? $employee->user->roles->pluck('name')->first() : null;
-    } // <-- Esta llave faltaba
+    }
 
     public function render()
     {
@@ -97,6 +115,7 @@ class EditEmployee extends Component
             'contract_type_id'  => 'required|exists:contract_types,id',
             'selectedRoles'     => 'nullable|string|exists:roles,name',
             'photoFile'         => 'nullable|image|max:2048',
+            'shift_id'          => 'nullable|exists:shifts,id', // AGREGAR validación
             'shift1_id'         => 'required|exists:shifts,id',
             'shift2_id'         => 'nullable|different:shift1_id|exists:shifts,id',
             'shift1_start_date' => 'required|date',
@@ -130,9 +149,9 @@ class EditEmployee extends Component
             'contract_type_id'  => $this->contract_type_id,
         ]);
 
-        // 🔹 Detectar cambios en Employee y guardarlos en la bitácora
+        // Detectar cambios en Employee y guardarlos en la bitácora
         foreach ($this->employee->getChanges() as $field => $newValue) {
-            if ($field === 'updated_at') continue; // ignorar timestamps
+            if ($field === 'updated_at') continue;
 
             ChangeLog::create([
                 'model'         => 'Employee',
@@ -145,10 +164,10 @@ class EditEmployee extends Component
             ]);
         }
 
-        //  Sincronizar turnos con fechas
+        // Sincronizar turnos con fechas
         $this->syncEmployeeShifts();
 
-        //  Actualizar usuario asociado y registrar cambios
+        // Actualizar usuario asociado y registrar cambios
         if ($this->employee->user) {
             $user = $this->employee->user;
             $oldUserValues = $user->getOriginal();
@@ -193,7 +212,7 @@ class EditEmployee extends Component
         if ($this->shift1_id) {
             $shiftsData[$this->shift1_id] = [
                 'start_date' => $this->shift1_start_date ?: Carbon::now()->toDateString(),
-                'end_date' => null, // null significa asignación activa
+                'end_date' => null,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ];
@@ -203,13 +222,13 @@ class EditEmployee extends Component
         if ($this->shift2_id) {
             $shiftsData[$this->shift2_id] = [
                 'start_date' => $this->shift2_start_date ?: Carbon::now()->toDateString(),
-                'end_date' => $this->shift2_end_date, // Puede ser null (indefinido) o fecha específica
+                'end_date' => $this->shift2_end_date,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ];
         }
 
-        // 🔹 Antes de sincronizar, registramos en bitácora
+        // Registrar en bitácora
         foreach ($shiftsData as $shiftId => $pivotData) {
             ChangeLog::create([
                 'model'         => 'EmployeeShift',
@@ -228,12 +247,10 @@ class EditEmployee extends Component
 
     public function updatedShift2Id($value)
     {
-        // Si se deselecciona el turno 2, limpiar las fechas
         if (!$value) {
             $this->shift2_start_date = null;
             $this->shift2_end_date = null;
         } else {
-            // Si se selecciona un turno y no hay fecha de inicio, usar la fecha actual
             if (!$this->shift2_start_date) {
                 $this->shift2_start_date = Carbon::now()->toDateString();
             }
@@ -242,7 +259,6 @@ class EditEmployee extends Component
 
     public function updatedShift2StartDate($value)
     {
-        // Si la fecha de fin es anterior a la de inicio, limpiarla
         if ($this->shift2_end_date && $value && $this->shift2_end_date < $value) {
             $this->shift2_end_date = null;
         }

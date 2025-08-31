@@ -9,6 +9,7 @@ use App\Models\SpecialDay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PayrollController extends Controller
 {
@@ -307,4 +308,184 @@ class PayrollController extends Controller
         if ($salarioQuincenal <= 2038.10) return ($salarioQuincenal - 895.24) * 0.20 + 60.00;
         return ($salarioQuincenal - 2038.10) * 0.30 + 288.57;
     }
+
+        /**
+     * Mostrar planilla del empleado autenticado
+     */
+    public function showEmployeePayroll()
+    {
+        $user = auth()->user();
+        $employee = $user->employee;
+        
+        if (!$employee) {
+            return redirect()->route('employee.dashboard')
+                            ->with('error', 'No se encontró información de empleado asociada.');
+        }
+
+        // Calcular periodo actual
+        $today = Carbon::today();
+        $start = $today->copy()->startOfMonth();
+        $end   = $today->copy()->endOfMonth();
+
+        if ($today->day <= 15) {
+            $periodStart = $start;
+            $periodEnd   = $start->copy()->addDays(14);
+        } else {
+            $periodStart = $start->copy()->addDays(15);
+            $periodEnd   = $end;
+        }
+
+        // Buscar planilla existente para este período
+        $payrollDetail = PayrollDetail::where('employee_id', $employee->id)
+            ->whereHas('payroll', function($q) use ($periodStart, $periodEnd) {
+                $q->where('period_start', $periodStart)
+                ->where('period_end', $periodEnd);
+            })
+            ->with('payroll')
+            ->first();
+
+        // Si no existe planilla, calcular datos temporales para preview
+        if (!$payrollDetail) {
+            $totales = $this->calcularTotales($employee, $periodStart, $periodEnd);
+            
+            // Crear objeto temporal para la vista
+            $payrollDetail = (object) [
+                'payroll' => (object) [
+                    'period_start' => $periodStart,
+                    'period_end' => $periodEnd,
+                    'status' => 'pending'
+                ],
+                'base_salary' => $totales['base_salary'],
+                'bonuses_total' => $totales['bonuses_total'],
+                'deductions_total' => $totales['deductions_total'],
+                'advances_total' => $totales['advances_total'],
+                'extra_hours_total' => $totales['extra_hours_total'],
+                'isss' => $totales['isss'],
+                'afp' => $totales['afp'],
+                'isr' => $totales['isr'],
+                'net_salary' => $totales['net_salary'],
+            ];
+        }
+
+        // Obtener detalles adicionales para mostrar en la vista
+        $bonuses = $employee->bonuses()
+            ->wherePivot('status', 'active')
+            ->wherePivotBetween('applied_at', [$periodStart, $periodEnd])
+            ->get();
+
+        $deductions = $employee->deductions()
+            ->wherePivot('status', 'active')
+            ->wherePivotBetween('applied_at', [$periodStart, $periodEnd])
+            ->get();
+
+        $advances = $employee->anticipos()
+            ->whereBetween('date', [$periodStart, $periodEnd])
+            ->where('status', 'active')
+            ->get();
+
+        $extraHours = \App\Models\ExtraHour::where('employee_id', $employee->id)
+            ->whereBetween('date', [$periodStart, $periodEnd])
+            ->get();
+
+        return view('employee.payroll', compact(
+            'employee', 
+            'payrollDetail', 
+            'periodStart', 
+            'periodEnd',
+            'bonuses',
+            'deductions', 
+            'advances',
+            'extraHours'
+        ));
+    }
+
+    /**
+ * Descargar planilla del empleado autenticado en PDF
+ */
+public function downloadEmployeePayrollPDF()
+{
+    $user = auth()->user();
+    $employee = $user->employee;
+    
+    if (!$employee) {
+        return redirect()->route('employee.dashboard')
+                        ->with('error', 'No se encontró información de empleado asociada.');
+    }
+
+    // Calcular periodo actual (mismo código que showEmployeePayroll)
+    $today = Carbon::today();
+    $start = $today->copy()->startOfMonth();
+    $end   = $today->copy()->endOfMonth();
+
+    if ($today->day <= 15) {
+        $periodStart = $start;
+        $periodEnd   = $start->copy()->addDays(14);
+    } else {
+        $periodStart = $start->copy()->addDays(15);
+        $periodEnd   = $end;
+    }
+
+    // Buscar planilla existente para este período
+    $payrollDetail = PayrollDetail::where('employee_id', $employee->id)
+        ->whereHas('payroll', function($q) use ($periodStart, $periodEnd) {
+            $q->where('period_start', $periodStart)
+            ->where('period_end', $periodEnd);
+        })
+        ->with('payroll')
+        ->first();
+
+    // Si no existe planilla, calcular datos temporales
+    if (!$payrollDetail) {
+        $totales = $this->calcularTotales($employee, $periodStart, $periodEnd);
+        
+        $payrollDetail = (object) [
+            'payroll' => (object) [
+                'period_start' => $periodStart,
+                'period_end' => $periodEnd,
+                'status' => 'pending'
+            ],
+            'base_salary' => $totales['base_salary'],
+            'bonuses_total' => $totales['bonuses_total'],
+            'deductions_total' => $totales['deductions_total'],
+            'advances_total' => $totales['advances_total'],
+            'extra_hours_total' => $totales['extra_hours_total'],
+            'isss' => $totales['isss'],
+            'afp' => $totales['afp'],
+            'isr' => $totales['isr'],
+            'net_salary' => $totales['net_salary'],
+        ];
+    }
+
+    // Obtener detalles adicionales
+    $bonuses = $employee->bonuses()
+        ->wherePivot('status', 'active')
+        ->wherePivotBetween('applied_at', [$periodStart, $periodEnd])
+        ->get();
+
+    $deductions = $employee->deductions()
+        ->wherePivot('status', 'active')
+        ->wherePivotBetween('applied_at', [$periodStart, $periodEnd])
+        ->get();
+
+    $advances = $employee->anticipos()
+        ->whereBetween('date', [$periodStart, $periodEnd])
+        ->where('status', 'active')
+        ->get();
+
+    // Generar PDF
+    $pdf = \PDF::loadView('employee.payroll-pdf', compact(
+        'employee', 
+        'payrollDetail', 
+        'periodStart', 
+        'periodEnd',
+        'bonuses',
+        'deductions', 
+        'advances'
+    ));
+
+    $fileName = 'planilla_' . $employee->first_name . '_' . $employee->last_name . '_' . 
+                $periodStart->format('Y-m-d') . '_' . $periodEnd->format('Y-m-d') . '.pdf';
+
+    return $pdf->download($fileName);
+}
 }

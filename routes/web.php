@@ -517,3 +517,15 @@ Route::middleware('auth')->group(function () {
     Route::patch('/payrolls/{payroll}/status', [PayrollController::class, 'updateStatus'])
         ->name('payrolls.updateStatus');
 });
+
+// Ruta para que un empleado vea su propia planilla
+Route::middleware('auth')->get('/employee/payroll', function() {
+    checkEmployee();
+    return app(PayrollController::class)->showEmployeePayroll();
+})->name('employee.payroll');
+
+// Ruta para descargar PDF de planilla del empleado
+Route::middleware('auth')->get('/employee/payroll/pdf', function() {
+    checkEmployee();
+    return app(PayrollController::class)->downloadEmployeePayrollPDF();
+})->name('employee.payroll.pdf');
