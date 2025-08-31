@@ -29,23 +29,28 @@ use App\Models\Employee;
 use Livewire\Livewire;
 
 // Helper functions
-function checkAdmin() {
-    if (!auth()->check()) {
-        abort(401, 'No autenticado');
-    }
-    if (!auth()->user()->hasRole('Administrador')) {
-        abort(403, 'Acceso denegado.');
+if (!function_exists('checkAdmin')) {
+    function checkAdmin() {
+        if (!auth()->check()) {
+            abort(401, 'No autenticado');
+        }
+        if (!auth()->user()->hasRole('Administrador')) {
+            abort(403, 'Acceso denegado.');
+        }
     }
 }
 
-function checkEmployee() {
-    if (!auth()->check()) {
-        abort(401, 'No autenticado');
-    }
-    if (!auth()->user()->hasRole('Empleado')) {
-        abort(403, 'Acceso denegado. Solo empleados pueden acceder.');
+if (!function_exists('checkEmployee')) {
+    function checkEmployee() {
+        if (!auth()->check()) {
+            abort(401, 'No autenticado');
+        }
+        if (!auth()->user()->hasRole('Empleado')) {
+            abort(403, 'Acceso denegado. Solo empleados pueden acceder.');
+        }
     }
 }
+
 
 // Public routes
 Route::get('/', function () {
