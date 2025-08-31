@@ -431,6 +431,10 @@ Route::middleware('auth')->group(function() {
     Route::get('/employees/{employeeId}/infoAsistencias', InfoEmployee::class)
         ->name('employee.infoAsistencias');
 
+    Route::get('/employee/attendance', function() {
+        return app(\App\Livewire\Attendance\EmployeeAttendance::class)();
+    })->name('employee.attendance');
+
     //Rutas de Special Days
     Route::middleware(['auth'])->group(function() {
         Route::get('/special-days', \App\Livewire\SpecialDays\Index::class)
