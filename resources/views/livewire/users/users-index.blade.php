@@ -35,7 +35,11 @@
                             placeholder="Buscar por nombre o email..." 
                             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
-                     
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 
@@ -57,12 +61,12 @@
                     </button>
                     <button wire:click="resetSearch" 
                             class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
-                        Limpiar
+                        Eliminar filtro
                     </button>
                 </div>
             </div>
             
-            <!-- Stats Info -->
+            <!-- Debug Info -->
             <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
                 <div>
                     Filtro actual: <span class="font-medium">{{ $filterRole === 'all' ? 'Todos los roles' : $filterRole }}</span>
@@ -74,25 +78,17 @@
         </div>
     </div>
 
-    <!-- Users Grid -->
+    <!-- Users Table -->
     @if($users->count())
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($users as $user)
-                
-            @endforeach
-        </div>
-
-        <!-- Mobile Table View (Hidden by default, can be toggled) -->
-        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden lg:hidden">
-            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Vista de tabla</h3>
-            </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen de perfil</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                         </tr>
@@ -101,25 +97,10 @@
                         @foreach($users as $user)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="h-10 w-10 flex-shrink-0">
-                                            @if($user->profile_image_path)
-                                                <img src="{{ asset('storage/' . $user->profile_image_path) }}" 
-                                                     alt="Foto de perfil" 
-                                                     class="h-10 w-10 rounded-full object-cover">
-                                            @else
-                                                <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
-                                                    </svg>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
-                                            <div class="text-sm text-gray-500">{{ $user->email }}</div>
-                                        </div>
-                                    </div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ $user->email }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php $userRole = $this->getUserRole($user); @endphp
@@ -133,7 +114,20 @@
                                             {{ $userRole }}
                                         </span>
                                     @else
-                                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Sin rol</span>
+                                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Sin rol asignado</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($user->profile_image_path)
+                                        <img src="{{ asset('storage/' . $user->profile_image_path) }}" 
+                                             alt="Foto de perfil" 
+                                             class="w-12 h-12 rounded-full object-cover">
+                                    @else
+                                        <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                                            </svg>
+                                        </div>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -144,30 +138,50 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                    <!-- Actions (same as above but condensed) -->
+                                    {{-- Botón Editar --}}
                                     @can('editar usuarios')
                                         @if($userRole === 'Empleado')
                                             @if($user->employee)
-                                                <a href="{{ route('employees.edit-live', $user->employee->id) }}" class="text-yellow-600 hover:text-yellow-900">Editar</a>
+                                                <a href="{{ route('employees.edit-live', $user->employee->id) }}" 
+                                                   class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors duration-200">
+                                                   Editar
+                                                </a>
                                             @else
-                                                <a href="#" class="text-yellow-600 hover:text-yellow-900">Editar</a>
+                                                <a href="#" 
+                                                   class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors duration-200">
+                                                   Editar
+                                                </a>
                                             @endif
                                         @else
-                                            <button wire:click.prevent="editUser({{ $user->id }})" class="text-yellow-600 hover:text-yellow-900">Editar</button>
+                                            <a href="#" wire:click.prevent="editUser({{ $user->id }})" 
+                                               class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors duration-200">
+                                               Editar
+                                            </a>
                                         @endif
                                     @endcan
 
+                                    {{-- Botón Activar solo para inactivos --}}
                                     @can('editar usuarios')
                                         @if(!$user->is_active)
-                                            <button wire:click="confirmActivation({{ $user->id }})" class="text-green-600 hover:text-green-900">Activar</button>
+                                            <button wire:click="confirmActivation({{ $user->id }})" 
+                                                    class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition-colors duration-200">
+                                                    Activar
+                                            </button>
                                         @endif
                                     @endcan
 
+                                    {{-- Botón Estado para activos o propio usuario --}}
                                     @can('estado usuarios')
                                         @if($user->isSelf)
-                                            <span class="text-gray-400 cursor-not-allowed">Estado</span>
+                                            <a href="#" onclick="alert('⚠ No puedes modificar tu propio estado.'); event.preventDefault();" 
+                                               class="cursor-not-allowed opacity-50 bg-gray-400 px-3 py-1 rounded text-white">
+                                               Estado
+                                            </a>
                                         @elseif($user->is_active)
-                                            <button wire:click.prevent="editStatus({{ $user->id }})" class="text-blue-600 hover:text-blue-900">Estado</button>
+                                            <a href="#" wire:click.prevent="editStatus({{ $user->id }})" 
+                                               class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors duration-200">
+                                               Estado
+                                            </a>
                                         @endif
                                     @endcan
                                 </td>
@@ -178,14 +192,15 @@
             </div>
         </div>
     @else
-        <div class="bg-white rounded-lg p-12 text-center">
+        <div class="bg-white rounded-lg p-12 text-center shadow-sm border border-gray-200">
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.196-2.121M9 12a3 3 0 106 0 3 3 0 00-6 0m8 8v-1a3 3 0 00-3-3H9a3 3 0 00-3 3v1"/>
             </svg>
             <h3 class="mt-4 text-lg font-medium text-gray-900">No hay usuarios disponibles</h3>
             <p class="mt-2 text-gray-500">No se encontraron usuarios con los filtros aplicados.</p>
             <div class="mt-6">
-                <button wire:click="resetSearch" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                <button wire:click="resetSearch" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
                     Limpiar filtros
                 </button>
             </div>
@@ -206,16 +221,16 @@
                     <h3 class="text-lg font-semibold text-gray-900">Activar Usuario</h3>
                 </div>
                 <p class="mb-6 text-gray-600">
-                    ¿Seguro que deseas activar al usuario <strong>{{ $userToActivateData->name ?? '' }}</strong>? 
+                    ¿Seguro que deseas activar al usuario <strong>{{ $userToActivateData->name ?? '' }}</strong>? Esta acción no se puede deshacer.
                 </p>
                 <div class="flex justify-end space-x-3">
                     <button wire:click="$set('confirmingActivation', false)" 
-                            class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg transition-colors duration-200">
+                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
                         Cancelar
                     </button>
                     <button wire:click="activateUser" 
                             class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
-                        Confirmar Activación
+                        Confirmar
                     </button>
                 </div>
             </div>
