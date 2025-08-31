@@ -4,10 +4,6 @@
 
 @section('contenido')
     <div class="bg-white p-6 rounded-lg shadow">
-        <h3 class="text-xl font-bold mb-4 text-green-700">Bienvenido al Sistema, {{ auth()->user()->employee->first_name ?? auth()->user()->name }}</h3>
-        <p class="text-gray-700">Aquí verás tus horarios, asistencias, bonos y más.</p>
-        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('ausencias-justificadas') }}"> Permisos y Ausencia</a></button>
-        <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('employee.attendance') }}"> Asistencia</a></button>
         <h3 class="text-xl font-bold mb-4 text-green-700">
             Bienvenido al Sistema, {{ auth()->user()->employee->first_name ?? auth()->user()->name }}
         </h3>
@@ -16,6 +12,9 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Botón de Permisos y Ausencias -->
+            
+            <button class="bg-green-500 text-white px-4 py-2 rounded"><a href="{{ route('employee.attendance') }}"> Asistencia</a></button>
+
             <a href="{{ route('ausencias-justificadas') }}" 
                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg text-center font-medium transition duration-200 flex items-center justify-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,6 +34,5 @@
                 Mi Planilla
             </a>
         </div>
-
     </div>
 @endsection
