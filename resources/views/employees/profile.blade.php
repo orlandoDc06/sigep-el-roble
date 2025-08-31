@@ -6,14 +6,14 @@
     <div class="max-w-7xl mx-auto p-6 space-y-8">
 
     {{-- Encabezado --}}
-    <div class="flex items-center bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-2xl p-6 shadow-lg">
+    <div class="flex items-center text-gray-900 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-2xl p-6 shadow-lg">
         <img src="{{ $user->profile_image_path ? Storage::url($user->profile_image_path) : '/img/default-avatar.png' }}" 
              alt="Foto de perfil"
              class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md">
         <div class="ml-6">
-            <h1 class="text-3xl font-bold">{{ $employee ? $employee->first_name.' '.$employee->last_name : $user->name }}</h1>
-            <p class="text-white/80">{{ $user->email }}</p>
-            <p class="mt-2 text-sm bg-white/20 px-3 py-1 rounded-full inline-block">
+            <h1 class="text-3xl font-bold text-gray-900 ml-2">{{ $employee ? $employee->first_name.' '.$employee->last_name : $user->name }}</h1>
+            <p class="text-white/80 text-gray-900 ml-2">{{ $user->email }}</p>
+            <p class="mt-2 text-sm text-gray-900 bg-white/20 px-3 py-1 rounded-full inline-block">
                 {{ $user->getRoleNames()->implode(', ') }}
             </p>
         </div>
