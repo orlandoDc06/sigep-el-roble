@@ -58,7 +58,7 @@ class ManageEmployees extends Component
         'contract_type_id' => 'required|exists:contract_types,id',
         'shift_id' => 'required|exists:shifts,id',
         'email' => 'required|email|max:255|unique:users,email',
-        'photoFile' => 'nullable|image|max:2048', // 2MB max
+        'photoFile' => 'nullable|image|max:2048',
         'selectedRoles' => 'required|exists:roles,name',
     ];
 
@@ -87,50 +87,70 @@ class ManageEmployees extends Component
     }
 
     public function store()
-{
-    $this->validate();
+    {
+        $this->validate();
 
-    if ($this->photoFile) {
-        $this->photo_path = $this->photoFile->store('photos', 'public');
+        if ($this->photoFile) {
+            $this->photo_path = $this->photoFile->store('photos', 'public');
+        }
+
+        if (!$this->hire_date) {
+            $this->hire_date = now()->toDateString();
+        }
+
+        if (!$this->status) {
+            $this->status = 'active';
+        }
+
+        $password = Str::random(10);
+
+        // 1. Crear usuario primero
+        $user = User::create([
+            'name' => $this->first_name . ' ' . $this->last_name,
+            'email' => $this->email,
+            'password' => Hash::make($password),
+        ]);
+
+        // Asignar rol al usuario
+        $user->assignRole($this->selectedRoles);
+
+        // 2. Crear empleado (SIN incluir shift_id porque no existe en la tabla employees)
+        $empleado = Employee::create([
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'dui' => $this->dui,
+            'phone' => $this->phone,
+            'address' => $this->address,
+            'birth_date' => $this->birth_date,
+            'hire_date' => $this->hire_date,
+            'termination_date' => $this->termination_date,
+            'gender' => $this->gender,
+            'marital_status' => $this->marital_status,
+            'status' => $this->status,
+            'branch_id' => $this->branch_id,
+            'contract_type_id' => $this->contract_type_id,
+            'user_id' => $user->id,
+            'photo_path' => $this->photo_path,
+        ]);
+
+        // 3. IMPORTANTE: Asignar el turno a través de la tabla pivot
+        if ($this->shift_id) {
+            $empleado->shifts()->attach($this->shift_id, [
+                'start_date' => $this->hire_date ?: now()->toDateString(),
+                'end_date' => null, // null = asignación permanente
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Notificar al usuario con sus credenciales
+        $user->notify(new SendCredentialNotification($this->email, $password));
+
+        session()->flash('message', 'Empleado y usuario creados correctamente. Credenciales enviadas por correo.');
+
+        $this->resetForm();
+        $this->loadEmployees();
     }
-
-    if (!$this->hire_date) {
-        $this->hire_date = now()->toDateString();
-    }
-
-    if (!$this->status) {
-        $this->status = 'active';
-    }
-
-    $password = Str::random(10);
-
-    // 1. Crear usuario primero (sin employee_id)
-    $user = User::create([
-        'name' => $this->first_name . ' ' . $this->last_name,
-        'email' => $this->email,
-        'password' => Hash::make($password),
-    ]);
-
-    // Asignar rol al usuario
-    $user->assignRole($this->selectedRoles);
-
-    // Crear empleado asignando el user_id
-    $empleado = Employee::create(array_merge($this->formData(), [
-        'user_id' => $user->id,
-        'photo_path' => $this->photo_path,
-    ]));
-
-    
-
-    // Notificar al usuario con sus credenciales
-    $user->notify(new SendCredentialNotification($this->email, $password));
-
-    session()->flash('message', 'Empleado y usuario creados correctamente. Credenciales enviadas por correo.');
-
-    $this->resetForm();
-    $this->loadEmployees();
-}
-
 
     public function edit($id)
     {
@@ -150,10 +170,16 @@ class ManageEmployees extends Component
         $this->status = $employee->status;
         $this->branch_id = $employee->branch_id;
         $this->contract_type_id = $employee->contract_type_id;
-        $this->shift_id = $employee->shift_id;
-        $user = User::where('employee_id', $this->employeeId)->first();
-        $this->selectedRoles = $user ? $user->getRoleNames()->first() : null;
 
+        // CORREGIR: Obtener el turno desde la tabla pivot
+        $currentShift = $employee->shifts()
+            ->wherePivot('end_date', null) // turno activo
+            ->first();
+        $this->shift_id = $currentShift ? $currentShift->id : null;
+
+        $user = User::where('id', $employee->user_id)->first();
+        $this->email = $user ? $user->email : null;
+        $this->selectedRoles = $user ? $user->getRoleNames()->first() : null;
 
         $this->editing = true;
     }
@@ -163,14 +189,48 @@ class ManageEmployees extends Component
         $this->validate([
             ...$this->rules,
             'dui' => 'required|string|max:20|unique:employees,dui,' . $this->employeeId,
-            'email' => 'required|email|max:255|unique:users,email,' . optional(User::where('employee_id', $this->employeeId)->first())->id,
+            'email' => 'required|email|max:255|unique:users,email,' . optional(User::where('id', Employee::find($this->employeeId)->user_id)->first())->id,
         ]);
 
         $employee = Employee::findOrFail($this->employeeId);
-        $employee->update($this->formData());
+
+        // Actualizar empleado (sin shift_id)
+        $employee->update([
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'dui' => $this->dui,
+            'phone' => $this->phone,
+            'address' => $this->address,
+            'birth_date' => $this->birth_date,
+            'hire_date' => $this->hire_date,
+            'termination_date' => $this->termination_date,
+            'gender' => $this->gender,
+            'marital_status' => $this->marital_status,
+            'status' => $this->status,
+            'branch_id' => $this->branch_id,
+            'contract_type_id' => $this->contract_type_id,
+            'photo_path' => $this->photo_path,
+        ]);
+
+        // Actualizar asignación de turno en tabla pivot
+        if ($this->shift_id) {
+            // Terminar turnos activos actuales
+            $employee->shifts()->updateExistingPivot(
+                $employee->shifts()->wherePivot('end_date', null)->pluck('shifts.id'),
+                ['end_date' => now()->toDateString()]
+            );
+
+            // Asignar nuevo turno
+            $employee->shifts()->attach($this->shift_id, [
+                'start_date' => now()->toDateString(),
+                'end_date' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         // Actualizar email del usuario asociado si cambia
-        $user = User::where('employee_id', $this->employeeId)->first();
+        $user = User::where('id', $employee->user_id)->first();
         if ($user) {
             $user->email = $this->email;
             $user->syncRoles([$this->selectedRoles]);
@@ -188,7 +248,7 @@ class ManageEmployees extends Component
         $employee = Employee::findOrFail($id);
 
         // También elimina el usuario asociado si quieres
-        $user = User::where('employee_id', $id)->first();
+        $user = User::where('id', $employee->user_id)->first();
         if ($user) {
             $user->delete();
         }
@@ -204,34 +264,13 @@ class ManageEmployees extends Component
         $this->resetForm();
     }
 
-    private function formData()
-    {
-        return [
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'dui' => $this->dui,
-            'phone' => $this->phone,
-            'address' => $this->address,
-            'birth_date' => $this->birth_date,
-            'hire_date' => $this->hire_date,
-            'termination_date' => $this->termination_date,
-            'gender' => $this->gender,
-            'marital_status' => $this->marital_status,
-            'status' => $this->status,
-            'branch_id' => $this->branch_id,
-            'contract_type_id' => $this->contract_type_id,
-            'shift_id' => $this->shift_id,
-            'photo_path' => $this->photo_path,
-        ];
-    }
-
     private function resetForm()
     {
         $this->reset([
             'first_name', 'last_name', 'dui', 'phone', 'address',
             'birth_date', 'hire_date', 'termination_date', 'gender',
             'marital_status', 'status', 'branch_id', 'contract_type_id',
-            'email', 'password', 'password_confirmation',
+            'shift_id', 'email', 'password', 'password_confirmation',
             'editing', 'employeeId', 'photo_path', 'selectedRoles'
         ]);
     }
