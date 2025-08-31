@@ -175,7 +175,7 @@ function checkAdmin() {
     }
 
     if (!auth()->user()->hasRole('Administrador')) {
-        abort(403, 'Acceso denegado. Solo administradores pueden acceder.');
+        abort(403, 'Acceso denegado.');
     }
 }
 // Función helper para verificar si es empleado
