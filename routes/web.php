@@ -48,6 +48,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Livewire\Employees\EditEmployee;
+use App\Livewire\Employees\EditProfile;
 use App\Models\Employee;
 use App\Models\Deduction;
 use App\Models\Attendance;
@@ -416,6 +417,11 @@ Route::middleware(['auth', 'can:admin']) // o tu checkAdmin()
     ->get('/employees/{employee}/profile', [ProfileController::class, 'showEmployee'])
     ->name('employees.profile');
 
+    // Ruta para que un empleado edite su propio perfil
+Route::middleware(['auth']) // o tu checkAdmin()
+    ->get('/employees/{employee}/edit', EditProfile::class)
+    ->name('employees.edit');
+
 // Rutas de asistencia
 Route::middleware('auth')->group(function() {
     Route::get('/attendances', function() {
@@ -494,8 +500,8 @@ Route::middleware('auth')->get('/admin/legal-configurations/{id}/edit', function
 })->whereNumber('id')->name('admin.legal-configurations.edit');
 
 // Ruta principal: listado de empleados con estado de planilla
-Route::middleware('auth')->group(function () {    
-    
+Route::middleware('auth')->group(function () {
+
     //Listado de planillas (vista con Livewire)
     Route::get('/payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
 
