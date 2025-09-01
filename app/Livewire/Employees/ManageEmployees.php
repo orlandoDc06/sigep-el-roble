@@ -144,8 +144,10 @@ class ManageEmployees extends Component
         }
 
         // Notificar al usuario con sus credenciales
-        $user->notify(new SendCredentialNotification($this->email, $password));
-
+       dispatch(function () use ($user, $password) {
+            $user->notify(new SendCredentialNotification($this->email, $password));
+        });
+        
         session()->flash('message', 'Empleado y usuario creados correctamente. Credenciales enviadas por correo.');
 
         $this->resetForm();
