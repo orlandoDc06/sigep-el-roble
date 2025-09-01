@@ -7,7 +7,7 @@
 
     {{-- Encabezado --}}
     <div class="flex items-center text-gray-900 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-2xl p-6 shadow-lg">
-        <img src="{{ $user->profile_image_path ? Storage::url($user->profile_image_path) : '/img/default-avatar.png' }}" 
+        <img src="{{ $user->profile_image_path ? Storage::url($user->profile_image_path) : '/img/default-avatar.png' }}"
              alt="Foto de perfil"
              class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md">
         <div class="ml-6">
@@ -19,7 +19,7 @@
         </div>
         @if($employee)
         <div class="ml-auto">
-            <a href="{{ route('employees.edit-live', $employee->id) }}"
+            <a href="{{ route('employees.edit', $employee->id) }}"
                class="bg-white text-indigo-600 px-4 py-2 rounded-xl font-medium hover:bg-gray-100 shadow">
                 ✏️ Editar información
             </a>
