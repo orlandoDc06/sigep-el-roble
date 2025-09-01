@@ -270,7 +270,8 @@ class PayrollController extends Controller
 
 
         // === Faltas injustificadas ===
-        $workDays = Carbon::parse($periodStart)->diffInDaysFiltered(fn($d) => $d->isWeekday(), $periodEnd) + 1;
+        // Contar días hábiles de lunes a sábado (0=domingo, 1=lunes, ..., 6=sábado)
+        $workDays = Carbon::parse($periodStart)->diffInDaysFiltered(fn($d) => $d->dayOfWeek >= 1 && $d->dayOfWeek <= 6, $periodEnd) + 1; // Incluye el día de fin
         $attendedDays = $employee->attendances()->whereBetween('check_in_time', [$periodStart, $periodEnd])->count();
         $justifiedAbsences = $employee->justifiedAbsences()->whereBetween('date', [$periodStart, $periodEnd])->count();
         $holidays = SpecialDay::whereBetween('date', [$periodStart, $periodEnd])->count();

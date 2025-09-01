@@ -175,48 +175,70 @@ class EditEmployee extends Component
         // Sincronizar turnos con fechas
         $this->syncEmployeeShifts();
 
-        // Actualizar usuario asociado y registrar cambios
-        if ($this->employee->user) {
-            $user = $this->employee->user;
-            $oldUserValues = $user->getOriginal();
+    // Actualizar usuario asociado y registrar cambios
+    if ($this->employee->user) {
+        $user = $this->employee->user;
+        $oldUserValues = $user->getOriginal();
 
-            $user->name = $this->first_name . ' ' . $this->last_name;
-            $user->email = $this->email;
-            $user->profile_image_path = $this->photo_path;
-            $user->is_active = $this->status === 'active';
+        // Obtener roles anteriores para la bitácora
+        $oldRoles = $user->roles->pluck('name')->toArray();
 
-            // NUEVO: Actualizar contraseña si se proporcionó una nueva
-            if ($this->password) {
-                $user->password = Hash::make($this->password);
+        $user->name = $this->first_name . ' ' . $this->last_name;
+        $user->email = $this->email;
+        $user->profile_image_path = $this->photo_path;
+        $user->is_active = $this->status === 'active';
 
-                // Registrar cambio de contraseña en bitácora
+        // NUEVO: Actualizar contraseña si se proporcionó una nueva
+        if ($this->password) {
+            $user->password = Hash::make($this->password);
+
+            // Registrar cambio de contraseña en bitácora
+            ChangeLog::create([
+                'model'         => 'User',
+                'model_id'      => $user->id,
+                'field_changed' => 'password',
+                'old_value'     => '[PROTEGIDO]',
+                'new_value'     => '[ACTUALIZADO]',
+                'changed_by'    => Auth::id(),
+                'changed_at'    => now(),
+            ]);
+        }
+
+        // AGREGAR: Sincronizar roles
+        if ($this->selectedRoles) {
+            $user->syncRoles([$this->selectedRoles]);
+
+            // Registrar cambio de rol en bitácora
+            $newRoles = $user->fresh()->roles->pluck('name')->toArray();
+            if ($oldRoles !== $newRoles) {
                 ChangeLog::create([
                     'model'         => 'User',
                     'model_id'      => $user->id,
-                    'field_changed' => 'password',
-                    'old_value'     => '[PROTEGIDO]',
-                    'new_value'     => '[ACTUALIZADO]',
-                    'changed_by'    => Auth::id(),
-                    'changed_at'    => now(),
-                ]);
-            }
-
-            $user->save();
-
-            foreach ($user->getChanges() as $field => $newValue) {
-                if ($field === 'updated_at' || $field === 'password') continue; // Skip password ya que se registró arriba
-
-                ChangeLog::create([
-                    'model'         => 'User',
-                    'model_id'      => $user->id,
-                    'field_changed' => $field,
-                    'old_value'     => $oldUserValues[$field] ?? null,
-                    'new_value'     => $newValue,
+                    'field_changed' => 'roles',
+                    'old_value'     => implode(', ', $oldRoles),
+                    'new_value'     => implode(', ', $newRoles),
                     'changed_by'    => Auth::id(),
                     'changed_at'    => now(),
                 ]);
             }
         }
+
+        $user->save();
+
+        foreach ($user->getChanges() as $field => $newValue) {
+            if ($field === 'updated_at' || $field === 'password') continue; // Skip password ya que se registró arriba
+
+            ChangeLog::create([
+                'model'         => 'User',
+                'model_id'      => $user->id,
+                'field_changed' => $field,
+                'old_value'     => $oldUserValues[$field] ?? null,
+                'new_value'     => $newValue,
+                'changed_by'    => Auth::id(),
+                'changed_at'    => now(),
+            ]);
+        }
+    }
 
         session()->flash('message', 'Empleado actualizado correctamente.');
         return redirect()->route('employees.index');
