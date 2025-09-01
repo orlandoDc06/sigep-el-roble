@@ -15,13 +15,13 @@ class ForgotPassword extends Component
             'email' => 'required|email|exists:users,email',
         ]);
 
-        $status = Password::sendResetLink(['email' => $this->email]);
+        // Enviar a cola en lugar de envío directo
+        dispatch(function () {
+            Password::sendResetLink(['email' => $this->email]);
+        });
 
-        if ($status === Password::RESET_LINK_SENT) {
-            session()->flash('status', 'Enlace de recuperación enviado al correo.');
-        } else {
-            $this->addError('email', 'No se pudo enviar el enlace.');
-        }
+        // Siempre mostrar mensaje de éxito para mejor UX
+        session()->flash('status', 'Enlace de recuperación enviado al correo.');
     }
 
     public function render()
