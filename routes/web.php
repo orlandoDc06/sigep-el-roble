@@ -58,6 +58,8 @@ use App\Livewire\Admin\JustifiedAbsenceList;
 use App\Livewire\Employees\JustifiedAbsence\JustifiedAbsenceManager;
 
 use App\Http\Controllers\PayrollController;
+use App\Http\Controllers\ReportesController;
+use App\Livewire\Reports\BonosDescuentos;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -536,3 +538,12 @@ Route::middleware('auth')->get('/employee/payroll/pdf', function() {
     checkEmployee();
     return app(PayrollController::class)->downloadEmployeePayrollPDF();
 })->name('employee.payroll.pdf');
+
+// Rutas de reportes
+Route::get('/reportes/bonos-descuentos/pdf', [ReportesController::class, 'bonosDescuentosPdf'])
+    ->name('reportes.bonos-descuentos.pdf');
+
+    Route::middleware('auth')->group(function () {
+    Route::get('/reportes/bonos-descuentos', BonosDescuentos::class)
+        ->name('reportes.bonos-descuentos');
+});
