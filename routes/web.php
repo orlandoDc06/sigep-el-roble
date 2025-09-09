@@ -91,6 +91,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/branches/{id}/edit', \App\Livewire\Branches\Edit::class)->name('branches.edit');
 });
 
+Route::middleware('auth')->get('/admin/legal-configurations/form', function() {
+    checkAdmin();
+    return app(\App\Livewire\LegalConfigurations\LegalConfigurationForm::class)();
+})->name('admin.legal-configurations.form');
 
 // Rutas protegidas de gestión de usuarios
 Route::middleware('auth')->group(function () {
