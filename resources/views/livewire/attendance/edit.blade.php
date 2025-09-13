@@ -25,11 +25,29 @@
                 </div>
                 <div>
                     <p class="text-sm text-gray-600">Fecha:</p>
-                    <p class="font-medium">{{ $attendance->check_in_time->format('d/m/Y') }}</p>
+                <div class="mb-4">
+                    <div class="flex items-center gap-2">
+                        <input type="date" 
+                            wire:model="newDate" 
+                            class="border border-gray-300 rounded-md px-3 py-2"
+                            min="{{ $minDate }}"
+                            max="{{ $maxDate }}">
+                        <button type="button" 
+                                wire:click="updateDate" 
+                                class="p-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                                aceptar
+                        </button>
+                        <button type="button" 
+                                wire:click="toggleCalendar" 
+                                class="p-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        </button>
+                    </div>
+                    @error('newDate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
                 </div>
             </div>
         </div>
-
+        <!-- Calendario-->
         <form wire:submit.prevent="updateAttendance">
             <!-- Tipo de asistencia -->
             <div class="mb-6">
