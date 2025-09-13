@@ -17,6 +17,8 @@ class Edit extends Component
     public $doubleHoursTotal = 0;
     public $totalHours = 0;
     public $hasOvertime = false, $regularOvertime = 0, $doubleOvertime = 0;
+    public $showCalendar = false;
+    public $newDate;
     
     protected $rules = [
         'attendanceType' => 'required|in:on_time,late,absent',
@@ -25,6 +27,7 @@ class Edit extends Component
         'hasOvertime' => 'boolean',
         'regularOvertime' => 'required_if:hasOvertime,true|numeric|min:0|max:12',
         'doubleOvertime' => 'required_if:hasOvertime,true|numeric|min:0|max:12',
+        'newDate' => 'nullable|date',
     ];
 
     protected $messages = [
@@ -51,6 +54,7 @@ class Edit extends Component
         $this->attendanceType = $this->determineAttendanceStatus();
         $this->selectedShift = $this->attendance->shift_id;
         $this->notes = $this->attendance->notes ?? '';
+        $this->newDate = $this->attendance->check_in_time->format('Y-m-d');
         
         // Cargar horas extras existentes
         $this->loadExtraHours();
@@ -62,9 +66,10 @@ class Edit extends Component
         $this->regularOvertime = $this->regularHoursTotal;
         $this->doubleOvertime = $this->doubleHoursTotal;
     }
-    // Carga las horas ectras
+
+    // Carga las horas extras
     protected function loadExtraHours()
-    {// obtenemos las horas extras asociadas al ID del empleado
+    {
         $this->extraHours = ExtraHour::where('employee_id', $this->attendance->employee_id)
             ->whereDate('date', $this->attendance->check_in_time->toDateString())
             ->get();
@@ -94,6 +99,28 @@ class Edit extends Component
         $actualTime = $this->attendance->check_in_time->format('H:i:s');
         
         return ($actualTime > $scheduledTime) ? 'late' : 'on_time';
+    }
+
+    public function toggleCalendar()
+    {
+        $this->showCalendar = !$this->showCalendar;
+    }
+
+    public function updateDate()
+    {
+        $this->validate(['newDate' => 'required|date']);
+        
+        // Actualizar la fecha manteniendo la hora original
+        $originalTime = $this->attendance->check_in_time->format('H:i:s');
+        $newDateTime = Carbon::parse($this->newDate . ' ' . $originalTime);
+        
+        $this->attendance->update([
+            'check_in_time' => $newDateTime
+        ]);
+        
+        session()->flash('success', 'Fecha actualizada correctamente.');
+        $this->showCalendar = false;
+        $this->loadAttendanceData(); // Recargar datos
     }
 
     public function updateAttendance()
@@ -169,8 +196,13 @@ class Edit extends Component
 
     public function render()
     {
+        $minDate = now()->subYears(1)->format('Y-m-d');
+        $maxDate = now()->format('Y-m-d');
+        
         return view('livewire.attendance.edit', [
             'shifts' => Shift::all(),
+            'minDate' => $minDate,
+            'maxDate' => $maxDate,
         ]);
     }
 }
