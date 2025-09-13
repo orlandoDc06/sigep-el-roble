@@ -122,7 +122,7 @@
     </div>
 
     <!-- Salario Neto -->
-    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-md p-6 text-white mb-6">
+    <div class=" rounded-lg shadow-md p-6 text-white mb-6">
         <div class="text-center">
             <h2 class="text-2xl font-bold mb-2 text-gray-700">Salario Neto a Recibir</h2>
             <p class="text-3xl font-bold text-green-600">${{ number_format($payrollDetail->net_salary, 2) }}</p>
@@ -168,7 +168,7 @@
                 <div class="space-y-1">
                     @foreach($advances as $advance)
                     <div class="flex justify-between text-sm">
-                        <span>{{ $advance->date->format('d/m/Y') }}</span>
+                       {{ \Carbon\Carbon::parse($advance->date)->format('d/m/Y') }}
                         <span>${{ number_format($advance->amount, 2) }}</span>
                     </div>
                     @endforeach

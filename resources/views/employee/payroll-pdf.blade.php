@@ -285,7 +285,7 @@
                 <h4 class="advance-title">Anticipos</h4>
                 @foreach($advances as $advance)
                 <div class="detail-row">
-                    <span>{{ $advance->date->format('d/m/Y') }}</span>
+                    {{ \Carbon\Carbon::parse($advance->date)->format('d/m/Y') }}
                     <span>${{ number_format($advance->amount, 2) }}</span>
                 </div>
                 @endforeach
