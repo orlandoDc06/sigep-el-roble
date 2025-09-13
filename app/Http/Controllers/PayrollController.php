@@ -304,20 +304,20 @@ class PayrollController extends Controller
 
     private function calcularISR($salarioQuincenal)
     {
-        if ($salarioQuincenal <= 472.00) return 0;
-        if ($salarioQuincenal <= 895.24) return ($salarioQuincenal - 472.00) * 0.10 + 17.67;
-        if ($salarioQuincenal <= 2038.10) return ($salarioQuincenal - 895.24) * 0.20 + 60.00;
-        return ($salarioQuincenal - 2038.10) * 0.30 + 288.57;
+        if ($salarioQuincenal <= 275.00) return 0;
+        if ($salarioQuincenal <= 447.62) return ($salarioQuincenal - 275.00) * 0.10 + 8.83;
+        if ($salarioQuincenal <= 1019.05) return ($salarioQuincenal - 447.62) * 0.20 + 30.00;
+        return ($salarioQuincenal - 1019.05) * 0.30 + 144.28;
     }
 
-        /**
+    /**
      * Mostrar planilla del empleado autenticado
      */
     public function showEmployeePayroll()
     {
         $user = auth()->user();
         $employee = $user->employee;
-        
+
         if (!$employee) {
             return redirect()->route('employee.dashboard')
                             ->with('error', 'No se encontró información de empleado asociada.');
@@ -348,7 +348,7 @@ class PayrollController extends Controller
         // Si no existe planilla, calcular datos temporales para preview
         if (!$payrollDetail) {
             $totales = $this->calcularTotales($employee, $periodStart, $periodEnd);
-            
+
             // Crear objeto temporal para la vista
             $payrollDetail = (object) [
                 'payroll' => (object) [
@@ -389,12 +389,12 @@ class PayrollController extends Controller
             ->get();
 
         return view('employee.payroll', compact(
-            'employee', 
-            'payrollDetail', 
-            'periodStart', 
+            'employee',
+            'payrollDetail',
+            'periodStart',
             'periodEnd',
             'bonuses',
-            'deductions', 
+            'deductions',
             'advances',
             'extraHours'
         ));
@@ -407,7 +407,7 @@ public function downloadEmployeePayrollPDF()
 {
     $user = auth()->user();
     $employee = $user->employee;
-    
+
     if (!$employee) {
         return redirect()->route('employee.dashboard')
                         ->with('error', 'No se encontró información de empleado asociada.');
@@ -438,7 +438,7 @@ public function downloadEmployeePayrollPDF()
     // Si no existe planilla, calcular datos temporales
     if (!$payrollDetail) {
         $totales = $this->calcularTotales($employee, $periodStart, $periodEnd);
-        
+
         $payrollDetail = (object) [
             'payroll' => (object) [
                 'period_start' => $periodStart,
@@ -475,16 +475,16 @@ public function downloadEmployeePayrollPDF()
 
     // Generar PDF
     $pdf = \PDF::loadView('employee.payroll-pdf', compact(
-        'employee', 
-        'payrollDetail', 
-        'periodStart', 
+        'employee',
+        'payrollDetail',
+        'periodStart',
         'periodEnd',
         'bonuses',
-        'deductions', 
+        'deductions',
         'advances'
     ));
 
-    $fileName = 'planilla_' . $employee->first_name . '_' . $employee->last_name . '_' . 
+    $fileName = 'planilla_' . $employee->first_name . '_' . $employee->last_name . '_' .
                 $periodStart->format('Y-m-d') . '_' . $periodEnd->format('Y-m-d') . '.pdf';
 
     return $pdf->download($fileName);
