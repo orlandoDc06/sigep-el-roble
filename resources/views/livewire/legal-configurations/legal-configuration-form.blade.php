@@ -1,8 +1,3 @@
-@extends('layouts.app')
-
-@section('titulo', $configurationId ? 'Editar Configuración Legal' : 'Nueva Configuración Legal')
-
-@section('contenido')
 <div class="container mx-auto px-4 py-6">
     <div class="bg-white rounded-lg shadow-lg p-6">
         <!-- Header -->
@@ -15,20 +10,19 @@
                 <i class="fas fa-arrow-left mr-2"></i>Volver
             </a>
         </div>
-
+        
         <!-- Mensajes -->
         @if (session()->has('message'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                 {{ session('message') }}
             </div>
         @endif
-
         @if (session()->has('error'))
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                 {{ session('error') }}
             </div>
         @endif
-
+        
         <!-- Formulario -->
         <form wire:submit="save">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -43,21 +37,18 @@
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         @error('start_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
                         <input type="date" wire:model="end_date" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         @error('end_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Salario Mínimo ($) *</label>
                         <input type="number" step="0.01" wire:model="minimum_wage" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         @error('minimum_wage') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
-
                     <div class="flex items-center">
                         <input type="checkbox" wire:model="is_active" id="is_active"
                                class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
@@ -66,7 +57,7 @@
                         </label>
                     </div>
                 </div>
-
+                
                 <!-- Retenciones -->
                 <div class="space-y-4">
                     <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Retenciones Legales</h3>
@@ -77,21 +68,18 @@
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         @error('afp_percentage') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">ISSS (%) *</label>
                         <input type="number" step="0.01" wire:model="isss_percentage" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         @error('isss_percentage') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tope Máximo ISSS ($) *</label>
                         <input type="number" step="0.01" wire:model="isss_max_cap" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         @error('isss_max_cap') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
-
                     <div class="flex items-center">
                         <input type="checkbox" wire:model="income_tax_enabled" id="income_tax_enabled"
                                class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
@@ -100,7 +88,7 @@
                         </label>
                     </div>
                 </div>
-
+                
                 <!-- Bonificaciones -->
                 <div class="space-y-4">
                     <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Bonificaciones</h3>
@@ -111,7 +99,6 @@
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         @error('vacation_bonus_percentage') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Días Aguinaldo *</label>
                         <input type="number" wire:model="year_end_bonus_days" 
@@ -120,7 +107,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Rangos ISR -->
             @if($income_tax_enabled)
             <div class="mt-8">
@@ -131,7 +118,6 @@
                         <i class="fas fa-plus mr-1"></i>Agregar Rango
                     </button>
                 </div>
-
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200">
                         <thead class="bg-gray-50">
@@ -182,7 +168,7 @@
                 </div>
             </div>
             @endif
-
+            
             <!-- Botones de Acción -->
             <div class="mt-8 flex justify-end space-x-4">
                 <a href="{{ route('admin.legal-configurations.index') }}" 
@@ -198,4 +184,3 @@
         </form>
     </div>
 </div>
-@endsection

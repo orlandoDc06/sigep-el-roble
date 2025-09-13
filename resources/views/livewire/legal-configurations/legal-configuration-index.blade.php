@@ -1,8 +1,3 @@
-@extends('layouts.app')
-
-@section('titulo', 'Configuraciones Legales')
-
-@section('contenido')
 <div class="container mx-auto px-4 py-6">
     <div class="bg-white rounded-lg shadow-lg p-6">
         <!-- Header -->
@@ -128,4 +123,3 @@
         </div>
     </div>
 </div>
-@endsection
