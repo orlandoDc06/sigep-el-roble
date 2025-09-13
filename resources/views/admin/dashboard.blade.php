@@ -5,11 +5,11 @@
 @section('contenido')
 <div class="min-h-screen bg-gray-100 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         <!-- Contenido Principal -->
         <div class="bg-white rounded-b-lg shadow-lg">
-            
-          
+
+
             <div class="p-8 border-b border-gray-200">
                 <div class="flex items-center space-x-4">
                     <div class="bg-green-100 p-3 rounded-full">
@@ -26,7 +26,7 @@
 
             <!-- Secciones de Configuración -->
             <div class="p-8 space-y-8">
-                
+
                 <!-- Gestión de Personal -->
                 <div class="bg-gray-50 rounded-lg p-6">
                     <div class="flex items-center mb-6">
@@ -40,9 +40,9 @@
                             <p class="text-gray-600 text-sm ml-2">Administra empleados, usuarios y asistencias</p>
                         </div>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <a href="{{ route('employees.index') }}" 
+                        <a href="{{ route('employees.index') }}"
                            class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-blue-500 p-2 rounded-lg group-hover:bg-blue-600 transition-colors">
@@ -57,8 +57,8 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('users.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('users.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-green-500 p-2 rounded-lg group-hover:bg-green-600 transition-colors">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -72,11 +72,11 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('attendances.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('attendances.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-purple-500 rounded-lg group-hover:bg-purple-600 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                                     </svg>
                             </div>
@@ -87,11 +87,11 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('admin.justified-absences') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('admin.justified-absences') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-orange-500  rounded-lg group-hover:bg-orange-600 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                                     </svg>
                                 </div>
@@ -117,9 +117,9 @@
                             <p class="text-gray-600 text-sm ml-2">Sucursales, turnos y roles del sistema</p>
                         </div>
                     </div>
-    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="{{ route('branches.index') }}" 
+                        <a href="{{ route('branches.index') }}"
                            class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-green-500 p-2 rounded-lg group-hover:bg-green-600 transition-colors">
@@ -134,11 +134,11 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('shifts.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('shifts.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
-                                <div class="bg-orange-500 rounded-lg group-hover:bg-indigo-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                <div class="bg-orange-500 rounded-lg group-hover:bg-orange-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                                 </svg>
                                 </div>
@@ -149,8 +149,8 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('admin.roles.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('admin.roles.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-red-200 hover:border-red-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-red-500 p-2 rounded-lg group-hover:bg-red-600 transition-colors">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -180,10 +180,10 @@
                             <p class="text-gray-600 text-sm ml-2">Bonos, descuentos, anticipos y planillas</p>
                         </div>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="{{ route('bonuses.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('bonuses.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-green-500 p-2 rounded-lg group-hover:bg-green-600 transition-colors">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -197,11 +197,11 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('special-days.index') }}" 
+                        <a href="{{ route('special-days.index') }}"
                            class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-orange-600 p-2 rounded-lg group-hover:bg-orange-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M6 2a1 1 0 011 1v1h6V3a1 1 0 112 0v1h1a2 2 0 012 2v1H3V6a2 2 0 012-2h1V3a1 1 0 011-1zM3 9h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm4 2a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
                                 </svg>
                                 </div>
@@ -212,8 +212,8 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('bonuses-assignments.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('bonuses-assignments.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-blue-500 p-2 rounded-lg group-hover:bg-blue-600 transition-colors">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -227,10 +227,10 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('deductions.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('deductions.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
-                                <div class="bg-green-500 p-2 rounded-lg group-hover:bg-red-600 transition-colors">
+                                <div class="bg-green-500 p-2 rounded-lg group-hover:bg-green-600 transition-colors">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                     </svg>
@@ -242,11 +242,11 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('deductions-assignments.index') }}" 
+                        <a href="{{ route('deductions-assignments.index') }}"
                            class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-orange-500 rounded-lg group-hover:bg-orange-600 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                                      <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                     </svg>
 
@@ -257,15 +257,31 @@
                                 </div>
                             </div>
                         </a>
+
+                        <a href="{{ route('reportes.bonos-descuentos') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-orange-500 rounded-lg group-hover:bg-orange-600 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                     <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Reporte Bonos y Descuentos</p>
+                                    <p class="text-xs text-gray-500">Ver asignaciones</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
 
                     <!-- gestión financiera -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                        <a href="{{ route('advances.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('advances.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
-                                <div class="bg-purple-500 rounded-lg group-hover:bg-purple-600 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <div class="bg-green-500 rounded-lg group-hover:bg-green-600 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                     </svg>
                                 </div>
@@ -276,11 +292,11 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('payrolls.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('payrolls.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
-                                <div class="bg-teal-500 rounded-lg group-hover:bg-teal-600 transition-colors">
-                                   <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <div class="bg-green-500 rounded-lg group-hover:bg-green-600 transition-colors">
+                                   <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
                                     </svg>
                                 </div>
@@ -291,8 +307,8 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('change-logs.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('change-logs.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-gray-500 p-2 rounded-lg group-hover:bg-gray-600 transition-colors">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -321,13 +337,13 @@
                             <p class="text-gray-600 text-sm ml-2">Configuraciones legales, fórmulas y parámetros del sistema</p>
                         </div>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <a href="{{ route('admin.legal-configurations.index') }}" 
-                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200">
+                        <a href="{{ route('admin.legal-configurations.index') }}"
+                           class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
-                                <div class="bg-white-500 rounded-lg group-hover:bg-purple-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <div class="bg-blue-500 rounded-lg group-hover:bg-blue-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 2L3 7v11c0 5.55 3.84 2.97 9 2 5.16.97 9 3.55 9-2V7l-7-5zM6 9.99h8a1 1 0 110 2H6a1 1 0 110-2z" clip-rule="evenodd"/>
                                 </svg>
                                 </div>
@@ -338,11 +354,11 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('admin.formulas.index') }}" 
+                        <a href="{{ route('admin.formulas.index') }}"
                            class="group bg-white p-4 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-indigo-500 rounded-lg group-hover:bg-indigo-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm8 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" clip-rule="evenodd"/>
                                 </svg>
                                 </div>

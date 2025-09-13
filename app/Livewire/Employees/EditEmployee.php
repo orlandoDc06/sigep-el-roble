@@ -11,6 +11,7 @@ use App\Models\Shift;
 use Spatie\Permission\Models\Role;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\ChangeLog;
 
 class EditEmployee extends Component
@@ -22,6 +23,10 @@ class EditEmployee extends Component
     public $first_name, $last_name, $dui, $phone, $address;
     public $birth_date, $hire_date, $termination_date, $gender, $marital_status, $status, $photo_path;
     public $user_id, $branch_id, $contract_type_id, $email;
+
+    // NUEVO: Campo para contraseña
+    public $password;
+    public $password_confirmation;
 
     // Campos para turnos
     public $shift1_id;
@@ -59,10 +64,10 @@ class EditEmployee extends Component
         $this->contract_type_id = $employee->contract_type_id;
         $this->email = $employee->user ? $employee->user->email : null;
 
-        // AGREGAR: Obtener el turno principal actual del empleado (para compatibilidad con vista simple)
+        // AGREGAR: Obtener el turno principal actual del empleado
         $currentShift = $employee->shifts()
             ->withPivot('start_date', 'end_date')
-            ->wherePivot('end_date', null)
+            ->where('employee_shift_assignments.end_date', null)
             ->orderBy('employee_shift_assignments.start_date')
             ->first();
 
@@ -115,12 +120,15 @@ class EditEmployee extends Component
             'contract_type_id'  => 'required|exists:contract_types,id',
             'selectedRoles'     => 'nullable|string|exists:roles,name',
             'photoFile'         => 'nullable|image|max:2048',
-            'shift_id'          => 'nullable|exists:shifts,id', // AGREGAR validación
+            'shift_id'          => 'nullable|exists:shifts,id',
             'shift1_id'         => 'required|exists:shifts,id',
             'shift2_id'         => 'nullable|different:shift1_id|exists:shifts,id',
             'shift1_start_date' => 'required|date',
             'shift2_start_date' => 'nullable|date',
             'shift2_end_date'   => 'nullable|date|after_or_equal:shift2_start_date',
+            // NUEVO: Validaciones para contraseña
+            'password'          => 'nullable|string|min:8|confirmed',
+            'password_confirmation' => 'nullable|string|min:8',
         ]);
 
         if ($this->photoFile) {
@@ -167,31 +175,70 @@ class EditEmployee extends Component
         // Sincronizar turnos con fechas
         $this->syncEmployeeShifts();
 
-        // Actualizar usuario asociado y registrar cambios
-        if ($this->employee->user) {
-            $user = $this->employee->user;
-            $oldUserValues = $user->getOriginal();
+    // Actualizar usuario asociado y registrar cambios
+    if ($this->employee->user) {
+        $user = $this->employee->user;
+        $oldUserValues = $user->getOriginal();
 
-            $user->name = $this->first_name . ' ' . $this->last_name;
-            $user->email = $this->email;
-            $user->profile_image_path = $this->photo_path;
-            $user->is_active = $this->status === 'active';
-            $user->save();
+        // Obtener roles anteriores para la bitácora
+        $oldRoles = $user->roles->pluck('name')->toArray();
 
-            foreach ($user->getChanges() as $field => $newValue) {
-                if ($field === 'updated_at') continue;
+        $user->name = $this->first_name . ' ' . $this->last_name;
+        $user->email = $this->email;
+        $user->profile_image_path = $this->photo_path;
+        $user->is_active = $this->status === 'active';
 
+        // NUEVO: Actualizar contraseña si se proporcionó una nueva
+        if ($this->password) {
+            $user->password = Hash::make($this->password);
+
+            // Registrar cambio de contraseña en bitácora
+            ChangeLog::create([
+                'model'         => 'User',
+                'model_id'      => $user->id,
+                'field_changed' => 'password',
+                'old_value'     => '[PROTEGIDO]',
+                'new_value'     => '[ACTUALIZADO]',
+                'changed_by'    => Auth::id(),
+                'changed_at'    => now(),
+            ]);
+        }
+
+        // AGREGAR: Sincronizar roles
+        if ($this->selectedRoles) {
+            $user->syncRoles([$this->selectedRoles]);
+
+            // Registrar cambio de rol en bitácora
+            $newRoles = $user->fresh()->roles->pluck('name')->toArray();
+            if ($oldRoles !== $newRoles) {
                 ChangeLog::create([
                     'model'         => 'User',
                     'model_id'      => $user->id,
-                    'field_changed' => $field,
-                    'old_value'     => $oldUserValues[$field] ?? null,
-                    'new_value'     => $newValue,
+                    'field_changed' => 'roles',
+                    'old_value'     => implode(', ', $oldRoles),
+                    'new_value'     => implode(', ', $newRoles),
                     'changed_by'    => Auth::id(),
                     'changed_at'    => now(),
                 ]);
             }
         }
+
+        $user->save();
+
+        foreach ($user->getChanges() as $field => $newValue) {
+            if ($field === 'updated_at' || $field === 'password') continue; // Skip password ya que se registró arriba
+
+            ChangeLog::create([
+                'model'         => 'User',
+                'model_id'      => $user->id,
+                'field_changed' => $field,
+                'old_value'     => $oldUserValues[$field] ?? null,
+                'new_value'     => $newValue,
+                'changed_by'    => Auth::id(),
+                'changed_at'    => now(),
+            ]);
+        }
+    }
 
         session()->flash('message', 'Empleado actualizado correctamente.');
         return redirect()->route('employees.index');

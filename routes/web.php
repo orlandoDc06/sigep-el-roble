@@ -48,6 +48,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Management\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Livewire\Employees\EditEmployee;
+use App\Livewire\Employees\EditProfile;
 use App\Models\Employee;
 use App\Models\Deduction;
 use App\Models\Attendance;
@@ -57,6 +58,8 @@ use App\Livewire\Admin\JustifiedAbsenceList;
 use App\Livewire\Employees\JustifiedAbsence\JustifiedAbsenceManager;
 
 use App\Http\Controllers\PayrollController;
+use App\Http\Controllers\ReportesController;
+use App\Livewire\Reports\BonosDescuentos;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -168,24 +171,25 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
 
-// Función helper para verificar si es admin
-function checkAdmin() {
-    if (!auth()->check()) {
-        abort(401, 'No autenticado');
-    }
-
-    if (!auth()->user()->hasRole('Administrador')) {
-        abort(403, 'Acceso denegado. Solo administradores pueden acceder.');
+if (!function_exists('checkAdmin')) {
+    function checkAdmin() {
+        if (!auth()->check()) {
+            abort(401, 'No autenticado');
+        }
+        if (!auth()->user()->hasRole('Administrador')) {
+            abort(403, 'Acceso denegado.');
+        }
     }
 }
-// Función helper para verificar si es empleado
-function checkEmployee() {
-    if (!auth()->check()) {
-        abort(401, 'No autenticado');
-    }
 
-    if (!auth()->user()->hasRole('Empleado')) {
-        abort(403, 'Acceso denegado. Solo empleados pueden acceder.');
+if (!function_exists('checkEmployee')) {
+    function checkEmployee() {
+        if (!auth()->check()) {
+            abort(401, 'No autenticado');
+        }
+        if (!auth()->user()->hasRole('Empleado')) {
+            abort(403, 'Acceso denegado. Solo empleados pueden acceder.');
+        }
     }
 }
 
@@ -415,6 +419,11 @@ Route::middleware(['auth', 'can:admin']) // o tu checkAdmin()
     ->get('/employees/{employee}/profile', [ProfileController::class, 'showEmployee'])
     ->name('employees.profile');
 
+    // Ruta para que un empleado edite su propio perfil
+Route::middleware(['auth']) // o tu checkAdmin()
+    ->get('/employees/{employee}/edit', EditProfile::class)
+    ->name('employees.edit');
+
 // Rutas de asistencia
 Route::middleware('auth')->group(function() {
     Route::get('/attendances', function() {
@@ -430,6 +439,10 @@ Route::middleware('auth')->group(function() {
     });
     Route::get('/employees/{employeeId}/infoAsistencias', InfoEmployee::class)
         ->name('employee.infoAsistencias');
+
+    Route::get('/employee/attendance', function() {
+        return app(\App\Livewire\Attendance\EmployeeAttendance::class)();
+    })->name('employee.attendance');
 
     //Rutas de Special Days
     Route::middleware(['auth'])->group(function() {
@@ -489,8 +502,8 @@ Route::middleware('auth')->get('/admin/legal-configurations/{id}/edit', function
 })->whereNumber('id')->name('admin.legal-configurations.edit');
 
 // Ruta principal: listado de empleados con estado de planilla
-Route::middleware('auth')->group(function () {    
-    
+Route::middleware('auth')->group(function () {
+
     //Listado de planillas (vista con Livewire)
     Route::get('/payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
 
@@ -525,3 +538,12 @@ Route::middleware('auth')->get('/employee/payroll/pdf', function() {
     checkEmployee();
     return app(PayrollController::class)->downloadEmployeePayrollPDF();
 })->name('employee.payroll.pdf');
+
+// Rutas de reportes
+Route::get('/reportes/bonos-descuentos/pdf', [ReportesController::class, 'bonosDescuentosPdf'])
+    ->name('reportes.bonos-descuentos.pdf');
+
+    Route::middleware('auth')->group(function () {
+    Route::get('/reportes/bonos-descuentos', BonosDescuentos::class)
+        ->name('reportes.bonos-descuentos');
+});
