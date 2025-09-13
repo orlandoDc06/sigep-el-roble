@@ -490,6 +490,11 @@ Route::middleware('auth')->get('/admin/formulas/{id}/edit', function($id) {
 })->whereNumber('id')->name('admin.formulas.edit');
 
 //RUTAS PROTEGIDAS PARA CONFIGURACIONES LEGALES -- SOLO ADMINISTRADORES
+Route::middleware('auth')->get('/admin/legal-configurations/form', function() {
+    checkAdmin();
+    return app(\App\Livewire\LegalConfigurations\LegalConfigurationForm::class)();
+})->name('admin.legal-configurations.form');
+
 Route::middleware('auth')->get('/admin/legal-configurations', function() {
     checkAdmin();
     return app(\App\Livewire\LegalConfigurations\LegalConfigurationIndex::class)();
